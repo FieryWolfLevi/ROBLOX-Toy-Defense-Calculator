@@ -1,0 +1,5 @@
+# GitHub Pages & OS files
+.DS_Store
+Thumbs.db
+*.tmp
+*.log

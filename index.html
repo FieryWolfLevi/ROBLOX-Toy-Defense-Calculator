@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toy Defense Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="app-header">
+        <h1>Toy Defense Calculator</h1>
+        <div class="nav-tabs">
+          <button
+            id="tab-calculator"
+            class="nav-tab active"
+            onclick="switchTab('calculator')"
+          >
+            Lunchbox Calculator
+          </button>
+          <button
+            id="tab-item-finder"
+            class="nav-tab"
+            onclick="switchTab('item-finder')"
+          >
+            Items Browser
+          </button>
+          <button
+            id="tab-wave-calc"
+            class="nav-tab"
+            onclick="switchTab('wave-calc')"
+          >
+            Wave Calculator
+          </button>
+        </div>
+        <div class="header-controls">
+          <div class="header-budget-box">
+            <div class="input-wrapper">
+              <span class="currency-symbol"><i data-lucide="cookie"></i></span>
+              <input
+                type="number"
+                id="budget-input"
+                class="budget-input header-crackers-input"
+                value="0"
+                min="0"
+                placeholder="Current Crackers"
+                title="Current Crackers Balance"
+              />
+            </div>
+          </div>
+          <div class="settings-wrapper">
+            <button
+              id="settings-btn"
+              class="settings-btn"
+              onclick="toggleSettingsPopup()"
+              title="Settings"
+            >
+              <i data-lucide="settings"></i>
+            </button>
+            <div
+              id="settings-popup"
+              class="settings-popup"
+              style="display: none"
+            >
+              <div class="settings-popup-title">Settings</div>
+              <label for="extra-toys-checkbox" class="toggle-label">
+                <input
+                  type="checkbox"
+                  id="extra-toys-checkbox"
+                  class="gamepass-checkbox"
+                  onchange="toggleExtraToysPass()"
+                />
+                <span>+50% Toys Gamepass</span>
+              </label>
+              <label
+                for="extra-crackers-checkbox"
+                class="toggle-label"
+                style="margin-top: 0.5rem"
+              >
+                <input
+                  type="checkbox"
+                  id="extra-crackers-checkbox"
+                  class="gamepass-checkbox"
+                  onchange="toggleExtraCrackersPass()"
+                />
+                <span>+50% Crackers Gamepass</span>
+              </label>
+              <label
+                for="group-bonus-checkbox"
+                class="toggle-label"
+                style="margin-top: 0.5rem"
+              >
+                <input
+                  type="checkbox"
+                  id="group-bonus-checkbox"
+                  class="gamepass-checkbox"
+                  onchange="toggleGroupBonus()"
+                />
+                <span>+10% Roblox Group Bonus</span>
+              </label>
+              <label
+                for="premium-bonus-checkbox"
+                class="toggle-label"
+                style="margin-top: 0.5rem"
+              >
+                <input
+                  type="checkbox"
+                  id="premium-bonus-checkbox"
+                  class="gamepass-checkbox"
+                  onchange="togglePremiumBonus()"
+                />
+                <span>+15% Roblox Premium Bonus</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div id="view-calculator" class="tab-view active">
+        <div class="game-layout">
+          <div id="crate-grid" class="crate-grid"></div>
+          <div id="inspector-panel" class="inspector-panel"></div>
+        </div>
+      </div>
+      <div id="view-item-finder" class="tab-view" style="display: none">
+        <div class="finder-filter-bar">
+          <div class="filter-row-top">
+            <div class="search-input-wrapper">
+              <i data-lucide="search" class="search-icon"></i>
+              <input
+                type="text"
+                id="item-search-input"
+                class="finder-search-input"
+                placeholder="Search items by name..."
+                oninput="renderItemFinder()"
+              />
+            </div>
+            <select
+              id="item-sort-select"
+              class="finder-sort-select"
+              onchange="renderItemFinder()"
+            >
+              <option value="rarity">Sort by: Rarity</option>
+              <option value="dps">Sort by: DPS (Damage/Sec)</option>
+              <option value="health">Sort by: Health (HP)</option>
+              <option value="damage">Sort by: Damage</option>
+              <option value="range">Sort by: Range</option>
+              <option value="name">Sort by: Name (A-Z)</option>
+              <option value="rate">Sort by: Drop Rate</option>
+            </select>
+          </div>
+          <div class="filter-row-bottom">
+            <div class="pills-group">
+              <span class="filter-label">TYPE:</span>
+              <button
+                class="pill active"
+                onclick="setCategoryFilter('all', this)"
+              >
+                All
+              </button>
+              <button class="pill" onclick="setCategoryFilter('soldier', this)">
+                Soldiers
+              </button>
+              <button class="pill" onclick="setCategoryFilter('trap', this)">
+                Traps
+              </button>
+              <button class="pill" onclick="setCategoryFilter('block', this)">
+                Blocks
+              </button>
+            </div>
+            <div class="pills-divider"></div>
+            <div class="pills-group">
+              <span class="filter-label">RARITY:</span>
+              <button
+                class="pill active"
+                onclick="setRarityFilter('All', this)"
+              >
+                All
+              </button>
+              <button class="pill" onclick="setRarityFilter('Mythical', this)">
+                Mythical
+              </button>
+              <button class="pill" onclick="setRarityFilter('Legendary', this)">
+                Legendary
+              </button>
+              <button class="pill" onclick="setRarityFilter('Epic', this)">
+                Epic
+              </button>
+              <button class="pill" onclick="setRarityFilter('Rare', this)">
+                Rare
+              </button>
+              <button class="pill" onclick="setRarityFilter('Uncommon', this)">
+                Uncommon
+              </button>
+              <button class="pill" onclick="setRarityFilter('Common', this)">
+                Common
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="finder-layout">
+          <div id="item-cards-grid" class="item-cards-grid"></div>
+          <div id="item-detail-panel" class="item-detail-panel"></div>
+        </div>
+      </div>
+      <div id="view-wave-calc" class="tab-view" style="display: none">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+          "
+        >
+          <button class="add-wave-btn" onclick="addWaveStrategy()">
+            + Add Wave Strategy
+          </button>
+        </div>
+        <div id="wave-strategies-grid" class="wave-strategies-grid"></div>
+      </div>
+    </div>
+    <script src="database.js"></script>
+    <script src="wave-calculator.js"></script>
+    <script src="item-finder.js"></script>
+    <script src="calculator.js"></script>
+  </body>
+</html>
