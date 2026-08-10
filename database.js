@@ -302,6 +302,13 @@ const itemDatabase = [
     rarity: "Mythical",
     rate: 0.0106,
     image: "images/items/orbital_tech.png",
+    stats: {
+      health: 7500,
+      damage: 4200,
+      aoe: 7,
+      reload_time: 4,
+      range: 70,
+    },
   },
   {
     name: "Railgunner",
@@ -329,6 +336,9 @@ const itemDatabase = [
     rarity: "Mythical",
     rate: 0.0518,
     image: "images/items/plasma_spikes.png",
+    stats: {
+      damage: 5400,
+    },
   },
   {
     name: "Void Outline Block",
@@ -346,6 +356,9 @@ const itemDatabase = [
     rarity: "Mythical",
     rate: 0.0772,
     image: "images/items/subspace_block.png",
+    stats: {
+      health: 20500,
+    },
   },
   {
     name: "Luxurious Block",
@@ -363,6 +376,9 @@ const itemDatabase = [
     rarity: "Mythical",
     rate: 0.113,
     image: "images/items/money_roll_block.png",
+    stats: {
+      health: 14000,
+    },
   },
   {
     name: "Error Block",
@@ -370,6 +386,9 @@ const itemDatabase = [
     rarity: "Mythical",
     rate: 0.1376,
     image: "images/items/error_block.png",
+    stats: {
+      health: 11500,
+    },
   },
   {
     name: "Barrier Block",
@@ -631,6 +650,13 @@ const itemDatabase = [
     rarity: "Epic",
     rate: 0.001211,
     image: "images/items/officer.png",
+    stats: {
+      health: 250,
+      damage: 42,
+      reload_time: 1,
+      range: 35,
+      range_buff: 15,
+    },
   },
   {
     name: "Battery",
