@@ -595,6 +595,13 @@ const itemDatabase = [
     rarity: "Epic",
     rate: 0.001211,
     image: "images/items/field_gun.png",
+    stats: {
+      health: 2700,
+      damage: 120,
+      aoe: 11,
+      reload_time: 5,
+      range: 120,
+    },
   },
   {
     name: "Flamethrower",
