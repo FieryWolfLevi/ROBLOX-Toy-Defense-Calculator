@@ -295,6 +295,12 @@ const itemDatabase = [
     rarity: "Mythical",
     rate: 0.0106,
     image: "images/items/laser_machinegunner.png",
+    stats: {
+      health: 10000,
+      damage: 125,
+      reload_time: 0.08,
+      range: 50,
+    },
   },
   {
     name: "Orbital Tech",
