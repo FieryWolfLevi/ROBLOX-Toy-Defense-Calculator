@@ -40,6 +40,13 @@
           >
             Wave Calculator
           </button>
+          <button
+            id="tab-building-guide"
+            class="nav-tab"
+            onclick="switchTab('building-guide')"
+          >
+            Building Guide
+          </button>
         </div>
         <div class="header-controls">
           <div class="header-budget-box">
@@ -225,8 +232,10 @@
         </div>
         <div id="wave-strategies-grid" class="wave-strategies-grid"></div>
       </div>
+      <div id="view-building-guide" class="tab-view" style="display: none"></div>
     </div>
     <script src="database.js"></script>
+    <script src="building-guide.js"></script>
     <script src="wave-calculator.js"></script>
     <script src="item-finder.js"></script>
     <script src="calculator.js"></script>

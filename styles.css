@@ -1233,3 +1233,470 @@ select {
   border: 1.5px solid var(--border-color) !important;
   box-sizing: border-box !important;
 }
+
+/* ==========================================================================
+   Building Guide Tab Styles
+   ========================================================================== */
+.guide-page-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 0.25rem;
+}
+
+.guide-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.25rem;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.guide-section-card.calc-card {
+  border-color: rgba(70, 178, 22, 0.35);
+  background: linear-gradient(135deg, rgba(16, 26, 18, 0.7) 0%, rgba(10, 15, 22, 0.8) 100%);
+}
+
+.guide-section-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.guide-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.guide-card-header .header-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--primary-color);
+}
+
+.guide-card-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.guide-card-header h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.guide-input-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.guide-input-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.guide-input-box label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.guide-input-box input[type="number"] {
+  background: rgba(7, 9, 14, 0.8);
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.55rem 0.85rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.guide-input-box input[type="number"]:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 12px rgba(70, 178, 22, 0.35);
+}
+
+.guide-calc-summary {
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  margin-bottom: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.guide-calc-summary.status-immune {
+  background: rgba(70, 178, 22, 0.15);
+  border: 1.5px solid rgba(70, 178, 22, 0.45);
+  color: #72f038;
+}
+
+.guide-calc-summary.status-vulnerable {
+  background: rgba(235, 77, 75, 0.15);
+  border: 1.5px solid rgba(235, 77, 75, 0.45);
+  color: #ff7675;
+}
+
+.summary-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.summary-badge i {
+  width: 20px;
+  height: 20px;
+}
+
+.summary-details {
+  font-size: 0.88rem;
+  color: #eee;
+  line-height: 1.4;
+}
+
+.guide-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+.guide-stat-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.guide-stat-card.highlight {
+  border-color: rgba(70, 178, 22, 0.5);
+  background: rgba(70, 178, 22, 0.1);
+}
+
+.guide-stat-card.stat-immune {
+  border-color: rgba(70, 178, 22, 0.5);
+  color: #72f038;
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.stat-value .unit {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.stat-sub {
+  font-size: 0.68rem;
+  color: var(--text-sub);
+  margin-top: 0.2rem;
+}
+
+.guide-grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: 1.25rem;
+}
+
+.guide-card-text {
+  font-size: 0.88rem;
+  color: #ccc;
+  line-height: 1.45;
+  margin: 0 0 0.5rem 0;
+}
+
+.formula-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  margin: 0.6rem 0;
+}
+
+.formula-box.highlight {
+  border-color: rgba(70, 178, 22, 0.4);
+  background: rgba(70, 178, 22, 0.08);
+}
+
+.formula-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.formula-math {
+  font-family: 'Outfit', monospace, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.formula-sub {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-sub);
+  margin-top: 0.25rem;
+}
+
+.guide-card-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #bbb;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.guide-card-note i {
+  width: 16px;
+  height: 16px;
+  color: var(--primary-color);
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.guide-list {
+  margin: 0.5rem 0;
+  padding-left: 1.2rem;
+  font-size: 0.88rem;
+  color: #ccc;
+}
+
+.guide-list li {
+  margin-bottom: 0.6rem;
+  line-height: 1.4;
+}
+
+.guide-list code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: #72f038;
+}
+
+.mini-formula {
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  font-family: monospace;
+  margin-top: 0.15rem;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.guide-ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.guide-ref-table th,
+.guide-ref-table td {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.85rem;
+}
+
+.guide-ref-table th {
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--text-sub);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.guide-ref-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.guide-ref-table td strong {
+  color: var(--primary-color);
+}
+
+/* Quick Converter & Soldier Reach Styles */
+.quick-calc-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(70, 178, 22, 0.3);
+  border-radius: 12px;
+  padding: 0.9rem;
+  margin-top: 1rem;
+}
+
+.quick-calc-col {
+  text-align: center;
+}
+
+.quick-val-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quick-val-num {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #72f038;
+  margin: 0.2rem 0;
+}
+
+.quick-val-sub {
+  font-size: 0.7rem;
+  color: var(--text-sub);
+}
+
+.quick-calc-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.size-inputs-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.size-inputs-row input[type="number"] {
+  padding: 0.45rem 0.6rem !important;
+  font-size: 0.9rem !important;
+  text-align: center;
+}
+
+.times-sym {
+  font-weight: 800;
+  color: var(--text-sub);
+  font-size: 1rem;
+}
+
+.guide-input-group.compact {
+  margin-bottom: 0.85rem;
+}
+
+.reach-block-breakdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(70, 178, 22, 0.35);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: #ddd;
+}
+
+.reach-block-breakdown .breakdown-icon {
+  width: 18px;
+  height: 18px;
+  color: #72f038;
+  flex-shrink: 0;
+}
+
+.reach-block-breakdown strong {
+  color: #72f038;
+}
+
+/* Height Breakdown Curve & Status Pills */
+.height-breakdown-wrapper {
+  margin-top: 1.25rem;
+}
+
+.breakdown-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.breakdown-title i {
+  width: 18px;
+  height: 18px;
+  color: var(--primary-color);
+}
+
+.table-row-immune {
+  background: rgba(70, 178, 22, 0.08) !important;
+}
+
+.table-row-splash-danger {
+  background: rgba(241, 196, 15, 0.08) !important;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.status-pill.pill-safe {
+  background: rgba(70, 178, 22, 0.2);
+  border: 1px solid rgba(70, 178, 22, 0.5);
+  color: #72f038;
+}
+
+.status-pill.pill-warning {
+  background: rgba(241, 196, 15, 0.2);
+  border: 1px solid rgba(241, 196, 15, 0.5);
+  color: #f1c40f;
+}
+
+.status-pill.pill-warn {
+  background: rgba(235, 77, 75, 0.15);
+  border: 1px solid rgba(235, 77, 75, 0.4);
+  color: #ff7675;
+}

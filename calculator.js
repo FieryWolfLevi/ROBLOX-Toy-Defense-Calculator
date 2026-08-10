@@ -75,32 +75,22 @@ let selectedCrateName = "Toothpick";
 let currentTab = "calculator";
 function switchTab(tab) {
   currentTab = tab;
-  const btnCalc = document.getElementById("tab-calculator");
-  const btnFinder = document.getElementById("tab-item-finder");
-  const btnWave = document.getElementById("tab-wave-calc");
-  if (btnCalc) btnCalc.classList.toggle("active", tab === "calculator");
-  if (btnFinder) btnFinder.classList.toggle("active", tab === "item-finder");
-  if (btnWave) btnWave.classList.toggle("active", tab === "wave-calc");
-  const viewCalc = document.getElementById("view-calculator");
-  const viewFinder = document.getElementById("view-item-finder");
-  const viewWave = document.getElementById("view-wave-calc");
-  if (viewCalc) {
-    viewCalc.classList.toggle("active", tab === "calculator");
-    viewCalc.style.display = tab === "calculator" ? "flex" : "none";
-  }
-  if (viewFinder) {
-    viewFinder.classList.toggle("active", tab === "item-finder");
-    viewFinder.style.display = tab === "item-finder" ? "flex" : "none";
-  }
-  if (viewWave) {
-    viewWave.classList.toggle("active", tab === "wave-calc");
-    viewWave.style.display = tab === "wave-calc" ? "flex" : "none";
-  }
+  document.querySelectorAll(".nav-tab").forEach((btn) => {
+    btn.classList.toggle("active", btn.id === `tab-${tab}`);
+  });
+  document.querySelectorAll(".tab-view").forEach((view) => {
+    const isActive = view.id === `view-${tab}`;
+    view.classList.toggle("active", isActive);
+    view.style.display = isActive ? "flex" : "none";
+  });
+
   if (tab === "wave-calc" && typeof renderWaveCalculator === "function") {
     renderWaveCalculator();
   } else if (tab === "item-finder" && typeof renderItemFinder === "function") {
     renderItemFinder();
-  } else {
+  } else if (tab === "building-guide" && typeof renderBuildingGuide === "function") {
+    renderBuildingGuide();
+  } else if (tab === "calculator") {
     updateCalculator();
   }
 }
