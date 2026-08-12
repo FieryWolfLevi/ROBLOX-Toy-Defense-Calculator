@@ -262,16 +262,6 @@ const crates = [
 ];
 const itemDatabase = [
   {
-    name: "Titanium Block",
-    category: "block",
-    rarity: "Legendary",
-    rate: 0.228675,
-    image: "images/items/titanium_block.png",
-    stats: {
-      health: 1650,
-    },
-  },
-  {
     name: "Shield Generator",
     category: "soldier",
     rarity: "Mythical",
@@ -281,6 +271,7 @@ const itemDatabase = [
       health: 100000,
       shield: 1000000,
     },
+    weight: 100,
   },
   {
     name: "Orbital Laser Station",
@@ -288,6 +279,14 @@ const itemDatabase = [
     rarity: "Mythical",
     rate: 0.001,
     image: "images/items/orbital_laser_station.png",
+    stats: {
+      health: 80000,
+      damage: 39000,
+      aoe: 20,
+      reload_time: 9,
+      range: 150,
+    },
+    weight: 100,
   },
   {
     name: "Laser Machinegunner",
@@ -301,6 +300,7 @@ const itemDatabase = [
       reload_time: 0.08,
       range: 50,
     },
+    weight: 20,
   },
   {
     name: "Orbital Tech",
@@ -315,6 +315,7 @@ const itemDatabase = [
       reload_time: 4,
       range: 70,
     },
+    weight: 20,
   },
   {
     name: "Railgunner",
@@ -328,6 +329,7 @@ const itemDatabase = [
       reload_time: 5,
       range: 100,
     },
+    weight: 20,
   },
   {
     name: "Plasma Mine",
@@ -335,6 +337,11 @@ const itemDatabase = [
     rarity: "Mythical",
     rate: 0.0518,
     image: "images/items/plasma_mine.png",
+    stats: {
+      damage: 4050,
+      aoe: 12,
+    },
+    weight: 2,
   },
   {
     name: "Plasma Spikes",
@@ -345,6 +352,7 @@ const itemDatabase = [
     stats: {
       damage: 5400,
     },
+    weight: 2,
   },
   {
     name: "Void Outline Block",
@@ -355,6 +363,7 @@ const itemDatabase = [
     stats: {
       health: 25000,
     },
+    weight: 1,
   },
   {
     name: "Subspace Block",
@@ -365,6 +374,7 @@ const itemDatabase = [
     stats: {
       health: 20500,
     },
+    weight: 1,
   },
   {
     name: "Luxurious Block",
@@ -375,6 +385,7 @@ const itemDatabase = [
     stats: {
       health: 17000,
     },
+    weight: 1,
   },
   {
     name: "Money Roll Block",
@@ -385,6 +396,7 @@ const itemDatabase = [
     stats: {
       health: 14000,
     },
+    weight: 1,
   },
   {
     name: "Error Block",
@@ -395,6 +407,7 @@ const itemDatabase = [
     stats: {
       health: 11500,
     },
+    weight: 1,
   },
   {
     name: "Barrier Block",
@@ -405,6 +418,7 @@ const itemDatabase = [
     stats: {
       health: 9300,
     },
+    weight: 1,
   },
   {
     name: "Forcefield Block",
@@ -415,6 +429,7 @@ const itemDatabase = [
     stats: {
       health: 7600,
     },
+    weight: 1,
   },
   {
     name: "Howitzer",
@@ -429,6 +444,7 @@ const itemDatabase = [
       reload_time: 6,
       range: 135,
     },
+    weight: 80,
   },
   {
     name: "Multi Rocketeer",
@@ -443,6 +459,7 @@ const itemDatabase = [
       reload_time: 1,
       range: 40,
     },
+    weight: 20,
   },
   {
     name: "Minigunner",
@@ -456,6 +473,7 @@ const itemDatabase = [
       reload_time: 0.1,
       range: 45,
     },
+    weight: 20,
   },
   {
     name: "Heavy Sniper",
@@ -469,6 +487,7 @@ const itemDatabase = [
       reload_time: 4,
       range: 90,
     },
+    weight: 20,
   },
   {
     name: "Commander",
@@ -483,6 +502,7 @@ const itemDatabase = [
       range: 40,
       damage_buff: 15,
     },
+    weight: 20,
   },
   {
     name: "Missile Silo",
@@ -495,6 +515,7 @@ const itemDatabase = [
       aoe: 14,
       range: 135,
     },
+    weight: 8,
   },
   {
     name: "TNT",
@@ -507,6 +528,7 @@ const itemDatabase = [
       damage: 700,
       aoe: 11,
     },
+    weight: 2,
   },
   {
     name: "Landmines",
@@ -518,6 +540,7 @@ const itemDatabase = [
       damage: 850,
       aoe: 11,
     },
+    weight: 2,
   },
   {
     name: "Metal Spikes",
@@ -528,6 +551,7 @@ const itemDatabase = [
     stats: {
       damage: 1100,
     },
+    weight: 2,
   },
   {
     name: "Piggy Bank",
@@ -538,6 +562,7 @@ const itemDatabase = [
     stats: {
       health: 4000,
     },
+    weight: 1,
   },
   {
     name: "Carbon Fiber Block",
@@ -548,6 +573,7 @@ const itemDatabase = [
     stats: {
       health: 6250,
     },
+    weight: 1,
   },
   {
     name: "Kevlar Block",
@@ -558,6 +584,7 @@ const itemDatabase = [
     stats: {
       health: 4800,
     },
+    weight: 1,
   },
   {
     name: "Ballistic Glass Block",
@@ -568,6 +595,7 @@ const itemDatabase = [
     stats: {
       health: 3650,
     },
+    weight: 1,
   },
   {
     name: "Gold Block",
@@ -578,6 +606,7 @@ const itemDatabase = [
     stats: {
       health: 2800,
     },
+    weight: 1,
   },
   {
     name: "Cookie Block",
@@ -588,6 +617,18 @@ const itemDatabase = [
     stats: {
       health: 2150,
     },
+    weight: 1,
+  },
+  {
+    name: "Titanium Block",
+    category: "block",
+    rarity: "Legendary",
+    rate: 0.228675,
+    image: "images/items/titanium_block.png",
+    stats: {
+      health: 1650,
+    },
+    weight: 1,
   },
   {
     name: "Field Gun",
@@ -602,6 +643,7 @@ const itemDatabase = [
       reload_time: 5,
       range: 120,
     },
+    weight: 60,
   },
   {
     name: "Flamethrower",
@@ -616,6 +658,7 @@ const itemDatabase = [
       reload_time: 0.18,
       range: 33,
     },
+    weight: 20,
   },
   {
     name: "Tuber",
@@ -630,6 +673,7 @@ const itemDatabase = [
       reload_time: 4,
       range: 35,
     },
+    weight: 20,
   },
   {
     name: "Machine Gunner",
@@ -643,6 +687,7 @@ const itemDatabase = [
       reload_time: 0.16,
       range: 40,
     },
+    weight: 20,
   },
   {
     name: "Sniper",
@@ -656,6 +701,7 @@ const itemDatabase = [
       reload_time: 3.5,
       range: 80,
     },
+    weight: 20,
   },
   {
     name: "Officer",
@@ -670,6 +716,7 @@ const itemDatabase = [
       range: 35,
       range_buff: 15,
     },
+    weight: 20,
   },
   {
     name: "Battery",
@@ -682,6 +729,7 @@ const itemDatabase = [
       damage: 150,
       aoe: 10,
     },
+    weight: 2,
   },
   {
     name: "Barbed Wire",
@@ -692,16 +740,18 @@ const itemDatabase = [
     stats: {
       damage: 230,
     },
+    weight: 2,
   },
   {
     name: "Canned Block",
-    category: "trap",
+    category: "block",
     rarity: "Epic",
     rate: 0.093763,
     image: "images/items/canned_block.png",
     stats: {
       health: 400,
     },
+    weight: 1,
   },
   {
     name: "Magnet Block",
@@ -712,6 +762,7 @@ const itemDatabase = [
     stats: {
       health: 1250,
     },
+    weight: 1,
   },
   {
     name: "Metal Block",
@@ -722,6 +773,7 @@ const itemDatabase = [
     stats: {
       health: 1000,
     },
+    weight: 1,
   },
   {
     name: "Tempered Glass Block",
@@ -732,6 +784,7 @@ const itemDatabase = [
     stats: {
       health: 790,
     },
+    weight: 1,
   },
   {
     name: "Outline Block",
@@ -742,6 +795,7 @@ const itemDatabase = [
     stats: {
       health: 625,
     },
+    weight: 1,
   },
   {
     name: "Obsidian Block",
@@ -752,6 +806,7 @@ const itemDatabase = [
     stats: {
       health: 500,
     },
+    weight: 1,
   },
   {
     name: "Scrap Metal Block",
@@ -762,6 +817,7 @@ const itemDatabase = [
     stats: {
       health: 395,
     },
+    weight: 1,
   },
   {
     name: "Rust Block",
@@ -772,6 +828,7 @@ const itemDatabase = [
     stats: {
       health: 315,
     },
+    weight: 1,
   },
   {
     name: "Mortar",
@@ -786,6 +843,7 @@ const itemDatabase = [
       reload_time: 4,
       range: 105,
     },
+    weight: 40,
   },
   {
     name: "Automatic Shotgunner",
@@ -799,6 +857,7 @@ const itemDatabase = [
       reload_time: 0.4,
       range: 25,
     },
+    weight: 20,
   },
   {
     name: "Rocketeer",
@@ -813,6 +872,7 @@ const itemDatabase = [
       reload_time: 4,
       range: 30,
     },
+    weight: 20,
   },
   {
     name: "Soldier",
@@ -826,6 +886,7 @@ const itemDatabase = [
       reload_time: 0.24,
       range: 35,
     },
+    weight: 20,
   },
   {
     name: "Marksman",
@@ -839,6 +900,7 @@ const itemDatabase = [
       reload_time: 3,
       range: 70,
     },
+    weight: 20,
   },
   {
     name: "Radio Operator",
@@ -850,6 +912,7 @@ const itemDatabase = [
       health: 50,
       range_buff: 10,
     },
+    weight: 20,
   },
   {
     name: "Coin Mine",
@@ -861,6 +924,7 @@ const itemDatabase = [
       damage: 40,
       aoe: 9,
     },
+    weight: 2,
   },
   {
     name: "Thumbtacks",
@@ -871,6 +935,7 @@ const itemDatabase = [
     stats: {
       damage: 50,
     },
+    weight: 2,
   },
   {
     name: "Boombox",
@@ -881,6 +946,7 @@ const itemDatabase = [
     stats: {
       health: 150,
     },
+    weight: 1,
   },
   {
     name: "LED",
@@ -891,6 +957,7 @@ const itemDatabase = [
     stats: {
       health: 100,
     },
+    weight: 1,
   },
   {
     name: "Pie Block",
@@ -901,6 +968,7 @@ const itemDatabase = [
     stats: {
       health: 60,
     },
+    weight: 1,
   },
   {
     name: "Metal Frame",
@@ -911,6 +979,7 @@ const itemDatabase = [
     stats: {
       health: 250,
     },
+    weight: 1,
   },
   {
     name: "Aluminum Block",
@@ -921,6 +990,7 @@ const itemDatabase = [
     stats: {
       health: 215,
     },
+    weight: 1,
   },
   {
     name: "Brick Block",
@@ -931,6 +1001,7 @@ const itemDatabase = [
     stats: {
       health: 185,
     },
+    weight: 1,
   },
   {
     name: "Stone Block",
@@ -941,6 +1012,7 @@ const itemDatabase = [
     stats: {
       health: 160,
     },
+    weight: 1,
   },
   {
     name: "Glass Block",
@@ -951,6 +1023,7 @@ const itemDatabase = [
     stats: {
       health: 140,
     },
+    weight: 1,
   },
   {
     name: "Rubik's Cube",
@@ -961,6 +1034,7 @@ const itemDatabase = [
     stats: {
       health: 120,
     },
+    weight: 1,
   },
   {
     name: "Plastic Block",
@@ -971,6 +1045,7 @@ const itemDatabase = [
     stats: {
       health: 105,
     },
+    weight: 1,
   },
   {
     name: "Dice Block",
@@ -981,6 +1056,7 @@ const itemDatabase = [
     stats: {
       health: 90,
     },
+    weight: 1,
   },
   {
     name: "Ice Block",
@@ -991,6 +1067,7 @@ const itemDatabase = [
     stats: {
       health: 78,
     },
+    weight: 1,
   },
   {
     name: "Wood Log",
@@ -1001,6 +1078,7 @@ const itemDatabase = [
     stats: {
       health: 66,
     },
+    weight: 1,
   },
   {
     name: "Gravel Block",
@@ -1011,6 +1089,7 @@ const itemDatabase = [
     stats: {
       health: 58,
     },
+    weight: 1,
   },
   {
     name: "Shotgunner",
@@ -1024,6 +1103,7 @@ const itemDatabase = [
       reload_time: 1.5,
       range: 20,
     },
+    weight: 20,
   },
   {
     name: "Demoman",
@@ -1038,6 +1118,7 @@ const itemDatabase = [
       reload_time: 3,
       range: 25,
     },
+    weight: 20,
   },
   {
     name: "Specialist",
@@ -1051,6 +1132,7 @@ const itemDatabase = [
       reload_time: 0.4,
       range: 30,
     },
+    weight: 20,
   },
   {
     name: "Musketeer",
@@ -1064,6 +1146,7 @@ const itemDatabase = [
       reload_time: 7,
       range: 55,
     },
+    weight: 20,
   },
   {
     name: "Gum",
@@ -1075,6 +1158,7 @@ const itemDatabase = [
       slow_percent: 100,
       slow_duration: 5,
     },
+    weight: 2,
   },
   {
     name: "Toy Caltrops",
@@ -1085,6 +1169,7 @@ const itemDatabase = [
     stats: {
       damage: 10,
     },
+    weight: 2,
   },
   {
     name: "Sandbags",
@@ -1095,6 +1180,7 @@ const itemDatabase = [
     stats: {
       health: 60,
     },
+    weight: 2,
   },
   {
     name: "Burger Block",
@@ -1105,6 +1191,7 @@ const itemDatabase = [
     stats: {
       health: 25,
     },
+    weight: 1,
   },
   {
     name: "Wooden Planks",
@@ -1115,6 +1202,7 @@ const itemDatabase = [
     stats: {
       health: 50,
     },
+    weight: 1,
   },
   {
     name: "Acrylic Block",
@@ -1125,6 +1213,7 @@ const itemDatabase = [
     stats: {
       health: 43,
     },
+    weight: 1,
   },
   {
     name: "Rubber Block",
@@ -1135,6 +1224,7 @@ const itemDatabase = [
     stats: {
       health: 37,
     },
+    weight: 1,
   },
   {
     name: "Tinfoil Block",
@@ -1145,6 +1235,7 @@ const itemDatabase = [
     stats: {
       health: 32,
     },
+    weight: 1,
   },
   {
     name: "Wooden Block",
@@ -1155,6 +1246,7 @@ const itemDatabase = [
     stats: {
       health: 28,
     },
+    weight: 1,
   },
   {
     name: "Jelly Block",
@@ -1165,6 +1257,7 @@ const itemDatabase = [
     stats: {
       health: 24,
     },
+    weight: 1,
   },
   {
     name: "Dirt Block",
@@ -1175,6 +1268,7 @@ const itemDatabase = [
     stats: {
       health: 21,
     },
+    weight: 1,
   },
   {
     name: "Puzzle Block",
@@ -1185,6 +1279,7 @@ const itemDatabase = [
     stats: {
       health: 18,
     },
+    weight: 1,
   },
   {
     name: "Grass Block",
@@ -1195,6 +1290,7 @@ const itemDatabase = [
     stats: {
       health: 16,
     },
+    weight: 1,
   },
   {
     name: "Snow Block",
@@ -1205,6 +1301,7 @@ const itemDatabase = [
     stats: {
       health: 14,
     },
+    weight: 1,
   },
   {
     name: "Sand Block",
@@ -1215,6 +1312,7 @@ const itemDatabase = [
     stats: {
       health: 12,
     },
+    weight: 1,
   },
   {
     name: "Hunter",
@@ -1228,6 +1326,7 @@ const itemDatabase = [
       reload_time: 1.25,
       range: 18,
     },
+    weight: 20,
   },
   {
     name: "Grenadier",
@@ -1242,6 +1341,7 @@ const itemDatabase = [
       reload_time: 2.5,
       range: 20,
     },
+    weight: 20,
   },
   {
     name: "Recruit",
@@ -1255,6 +1355,7 @@ const itemDatabase = [
       reload_time: 2,
       range: 25,
     },
+    weight: 20,
   },
   {
     name: "Gunslinger",
@@ -1268,16 +1369,18 @@ const itemDatabase = [
       reload_time: 4.5,
       range: 40,
     },
+    weight: 20,
   },
   {
     name: "Bricks",
-    category: "block",
+    category: "trap",
     rarity: "Common",
     rate: 0.047,
     image: "images/items/bricks.png",
     stats: {
       damage: 2,
     },
+    weight: 2,
   },
   {
     name: "Glue",
@@ -1289,6 +1392,7 @@ const itemDatabase = [
       slow_percent: 30,
       slow_duration: 20,
     },
+    weight: 1,
   },
   {
     name: "Jenga Block",
@@ -1299,6 +1403,7 @@ const itemDatabase = [
     stats: {
       health: 10,
     },
+    weight: 1,
   },
   {
     name: "Cardboard Box",
@@ -1309,6 +1414,7 @@ const itemDatabase = [
     stats: {
       health: 10,
     },
+    weight: 1,
   },
   {
     name: "Toothpick Block",
@@ -1319,6 +1425,7 @@ const itemDatabase = [
     stats: {
       health: 8,
     },
+    weight: 1,
   },
   {
     name: "Cheese Block",
@@ -1329,6 +1436,7 @@ const itemDatabase = [
     stats: {
       health: 7,
     },
+    weight: 1,
   },
   {
     name: "Newspaper Block",
@@ -1339,6 +1447,7 @@ const itemDatabase = [
     stats: {
       health: 6,
     },
+    weight: 1,
   },
   {
     name: "Styrofoam Block",
@@ -1349,6 +1458,7 @@ const itemDatabase = [
     stats: {
       health: 5,
     },
+    weight: 1,
   },
   {
     name: "Yarn Block",
@@ -1359,6 +1469,7 @@ const itemDatabase = [
     stats: {
       health: 4,
     },
+    weight: 1,
   },
   {
     name: "Marshmallow Block",
@@ -1369,6 +1480,7 @@ const itemDatabase = [
     stats: {
       health: 3,
     },
+    weight: 1,
   },
   {
     name: "Toothpick Frame",
@@ -1379,5 +1491,6 @@ const itemDatabase = [
     stats: {
       health: 2,
     },
+    weight: 1,
   },
 ];

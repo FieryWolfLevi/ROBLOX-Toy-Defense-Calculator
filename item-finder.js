@@ -1,6 +1,7 @@
 let selectedFinderItemName = "Shield Generator";
 let currentRarityFilter = "All";
 let currentCategoryFilter = "all";
+
 function setCategoryFilter(category, btn) {
   currentCategoryFilter = category;
   btn.parentElement
@@ -9,6 +10,7 @@ function setCategoryFilter(category, btn) {
   if (btn) btn.classList.add("active");
   renderItemFinder();
 }
+
 function setRarityFilter(rarity, btn) {
   currentRarityFilter = rarity;
   btn.parentElement.querySelectorAll(".pill").forEach((p) => {
@@ -22,10 +24,12 @@ function setRarityFilter(rarity, btn) {
   if (btn) btn.classList.add("active");
   renderItemFinder();
 }
+
 function selectFinderItem(name) {
   selectedFinderItemName = name;
   renderItemFinder();
 }
+
 function renderItemFinder() {
   const grid = document.getElementById("item-cards-grid");
   const searchVal = (document.getElementById("item-search-input")?.value || "")
@@ -71,6 +75,25 @@ function renderItemFinder() {
           return (b.stats?.damage || 0) - (a.stats?.damage || 0);
         }
         return dpsB - dpsA;
+      } else if (sortBy === "dps_weight") {
+        const calcDpsPerWeight = (item) => {
+          if (item.stats?.damage && item.stats?.reload_time) {
+            const dps = item.stats.damage / item.stats.reload_time;
+            const w = item.weight !== undefined ? item.weight : item.stats?.weight;
+            return w && w > 0 ? dps / w : 0;
+          }
+          return 0; // Single-use items rank below sustained DPS
+        };
+        const dwA = calcDpsPerWeight(a);
+        const dwB = calcDpsPerWeight(b);
+        if (dwA === dwB) {
+          return (b.stats?.damage || 0) - (a.stats?.damage || 0);
+        }
+        return dwB - dwA;
+      } else if (sortBy === "weight") {
+        const wA = a.weight !== undefined ? a.weight : (a.stats?.weight || 0);
+        const wB = b.weight !== undefined ? b.weight : (b.stats?.weight || 0);
+        return wB - wA;
       } else if (sortBy === "health") {
         return (b.stats?.health || 0) - (a.stats?.health || 0);
       } else if (sortBy === "damage") {
@@ -109,10 +132,22 @@ function renderItemFinder() {
       if (sortBy === "dps" && item.stats?.damage) {
         if (item.stats.reload_time) {
           const dps = item.stats.damage / item.stats.reload_time;
-          subBadge = `${dps.toFixed(1)} DPS`;
+          subBadge = item.stats.aoe ? `min. ${dps.toFixed(1)} DPS` : `${dps.toFixed(1)} DPS`;
         } else {
           subBadge = `${item.stats.damage} Single-Use`;
         }
+      } else if (sortBy === "dps_weight" && item.stats?.damage) {
+        if (item.stats.reload_time) {
+          const dps = item.stats.damage / item.stats.reload_time;
+          const w = item.weight !== undefined ? item.weight : item.stats?.weight;
+          const ratio = w && w > 0 ? dps / w : 0;
+          subBadge = item.stats.aoe ? `min. ${ratio.toFixed(1)} DPS/W` : `${ratio.toFixed(1)} DPS/W`;
+        } else {
+          subBadge = `${item.stats.damage} Single-Use`;
+        }
+      } else if (sortBy === "weight") {
+        const w = item.weight !== undefined ? item.weight : (item.stats?.weight || 0);
+        subBadge = `${w} Weight`;
       } else if (sortBy === "health" && item.stats?.health) {
         subBadge = `${item.stats.health} HP`;
       } else if (sortBy === "damage" && item.stats?.damage) {
@@ -121,7 +156,7 @@ function renderItemFinder() {
         subBadge = `${item.stats.range} Range`;
       }
       return `
-        <div class="item-card ${isSelected ? "selected" : ""}" onclick="selectFinderItem('${item.name.replace(/'/g, "\'")}')">
+        <div class="item-card ${isSelected ? "selected" : ""}" onclick="selectFinderItem('${item.name.replace(/'/g, "\\'")}')">
           <img src="${item.image}" alt="${item.name}" />
           <div class="item-card-name">${item.name}</div>
           <div class="item-card-badge" style="color: ${r_colors[item.rarity] || "#ffffff"};">${subBadge}</div>
@@ -133,9 +168,17 @@ function renderItemFinder() {
   const activeItem =
     itemDatabase.find((x) => x.name === selectedFinderItemName) || filtered[0];
   renderItemDetail(activeItem, budgetInput, toyMult);
+
+  setTimeout(() => {
+    const selectedCard = grid.querySelector(".item-card.selected");
+    if (selectedCard) {
+      selectedCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    }
+  }, 50);
 }
+
 function renderItemDetail(item, budgetInput, toyMult) {
-  const s = item.stats || {};
+  const s = item?.stats || {};
   const statLabels = [
     { key: "health", label: "Health", icon: "heart", suffix: "" },
     { key: "shield", label: "Shield", icon: "shield", suffix: "" },
@@ -159,19 +202,22 @@ function renderItemDetail(item, budgetInput, toyMult) {
     { key: "range_buff", label: "Range Buff", icon: "wifi", suffix: "%" },
   ];
   let statsGridHTML = "";
-  statLabels.forEach((st) => {
-    if (s[st.key] !== null && s[st.key] !== undefined) {
-      statsGridHTML += `
-        <div style="background: rgba(7, 9, 14, 0.6); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 0.8rem; color: var(--text-sub); font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;"><i data-lucide="${st.icon}" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> ${st.label}</span>
-          <span style="font-size: 0.95rem; color: #ffffff; font-weight: 900;">${s[st.key]}${st.suffix}</span>
-        </div>
-      `;
-    }
-  });
+  if (item) {
+    statLabels.forEach((st) => {
+      let val = s[st.key];
+      if (val !== null && val !== undefined) {
+        statsGridHTML += `
+          <div style="background: rgba(7, 9, 14, 0.6); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.8rem; color: var(--text-sub); font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;"><i data-lucide="${st.icon}" style="width:14px;height:14px;display:inline-block;vertical-align:middle;"></i> ${st.label}</span>
+            <span style="font-size: 0.95rem; color: #ffffff; font-weight: 900;">${val}${st.suffix}</span>
+          </div>
+        `;
+      }
+    });
+  }
   const statsSection = statsGridHTML
     ? `
-    <div style="margin-bottom: 1.25rem;">
+    <div style="margin-bottom: 1rem;">
       <div style="font-weight: 800; font-size: 0.85rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Item Attributes & Stats</div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
         ${statsGridHTML}
@@ -179,6 +225,19 @@ function renderItemDetail(item, budgetInput, toyMult) {
     </div>
   `
     : "";
+
+  const itemWeight = item ? (item.weight !== undefined ? item.weight : (s.weight !== undefined ? s.weight : null)) : null;
+  const weightSection = itemWeight !== null && itemWeight !== undefined
+    ? `
+    <div style="margin-bottom: 1.25rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-color);">
+      <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(7, 9, 14, 0.6); padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border-color);">
+        <span style="font-size: 0.8rem; color: var(--text-sub); font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem;"><i data-lucide="scale" style="width:14px;height:14px;display:inline-block;vertical-align:middle;color:var(--primary-color);"></i> Placement Weight</span>
+        <span style="font-size: 0.95rem; color: #ffffff; font-weight: 900;">${itemWeight}</span>
+      </div>
+    </div>
+  `
+    : "";
+
   const panel = document.getElementById("item-detail-panel");
   if (!panel) return;
   if (!item) {
@@ -193,6 +252,7 @@ function renderItemDetail(item, budgetInput, toyMult) {
     Uncommon: "var(--rarity-uncommon)",
     Common: "var(--rarity-common)",
   };
+
   const cratePerformances = crates
     .map((c) => {
       const crate_pct = c[item.rarity.toLowerCase()] || 0;
@@ -251,6 +311,7 @@ function renderItemDetail(item, budgetInput, toyMult) {
       <div style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">Yields ~${bestCrate.expYield.toFixed(2)} items with your current budget (${bestCrate.times}x Buys).</div>
     </div>
     ${statsSection}
+    ${weightSection}
     <div style="font-weight: 800; font-size: 0.85rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Lunchbox Efficiency Comparison</div>
     <div style="max-height: 300px; overflow-y: auto;">
       ${rowsHTML}
@@ -258,3 +319,14 @@ function renderItemDetail(item, budgetInput, toyMult) {
   `;
   if (window.lucide) lucide.createIcons();
 }
+
+// Runnable self-check (Ponytail check)
+(function selfCheckItemFinder() {
+  if (typeof itemDatabase !== "undefined" && itemDatabase.length > 0) {
+    const testItem = itemDatabase[0];
+    console.assert(
+      testItem.weight !== undefined || (testItem.stats && testItem.stats.weight !== undefined),
+      "Self-check failed: Item should have weight property defined in database"
+    );
+  }
+})();

@@ -19,10 +19,6 @@ function topEdgeReach(rangeStuds, unitHeight = 2.0) {
   return Math.max(0, studsToBlocks(rangeStuds) - (unitHeight / 2.0));
 }
 
-function emptyTileReach(rangeStuds, unitDepth = 1.0) {
-  return Math.max(0, studsToBlocks(rangeStuds) - unitDepth);
-}
-
 function directTargetImmunityHeight(rangeStuds, enemyDepthZ = 1.0) {
   const rEff = studsToBlocks(rangeStuds) - 0.5;
   const xMin = 0.5 + (enemyDepthZ / 2.0); // Min horizontal distance enemy center can reach
@@ -68,41 +64,26 @@ function updateSoldierReachCalc() {
   const reachY = topEdgeReach(range, sizeY);
   const reachZ = frontEdgeReach(range, sizeZ);
 
-  // Partial block cut-off details
-  const fullBlocksZ = Math.floor(reachZ);
-  const partialPctZ = Math.round((reachZ - fullBlocksZ) * 100);
-  const targetBlockNum = fullBlocksZ + 1;
-
   resultsBox.innerHTML = `
     <div class="guide-stats-grid">
       <div class="guide-stat-card highlight">
         <div class="stat-label">Radius from Center</div>
         <div class="stat-value">${centerRadius.toFixed(3)} <span class="unit">blocks</span></div>
-        <div class="stat-sub">Range ${range} studs (÷ 3.0)</div>
       </div>
       <div class="guide-stat-card">
         <div class="stat-label">Side Reach (X Edge)</div>
         <div class="stat-value">${reachX.toFixed(3)} <span class="unit">blocks</span></div>
-        <div class="stat-sub">Radius − ${(sizeX/2).toFixed(2)}</div>
       </div>
       <div class="guide-stat-card">
         <div class="stat-label">Top Reach (Y Edge)</div>
         <div class="stat-value">${reachY.toFixed(3)} <span class="unit">blocks</span></div>
-        <div class="stat-sub">Radius − ${(sizeY/2).toFixed(2)}</div>
       </div>
       <div class="guide-stat-card">
         <div class="stat-label">Front Reach (Z Edge)</div>
         <div class="stat-value">${reachZ.toFixed(3)} <span class="unit">blocks</span></div>
-        <div class="stat-sub">Radius − ${(sizeZ/2).toFixed(2)}</div>
       </div>
     </div>
-
-    <div class="reach-block-breakdown">
-      <i data-lucide="layers" class="breakdown-icon"></i>
-      <span>Front Reach covers <strong>${fullBlocksZ} full blocks</strong> + cuts <strong>${partialPctZ}%</strong> into <strong>Block #${targetBlockNum}</strong> past soldier's front edge.</span>
-    </div>
   `;
-  if (window.lucide) window.lucide.createIcons();
 }
 
 // Vertical Immunity Calculator
@@ -138,12 +119,10 @@ function updateGuideCalc() {
       <div class="guide-stat-card">
         <div class="stat-label">Attack Radius</div>
         <div class="stat-value">${baseRangeBlocks.toFixed(3)} <span class="unit">blocks</span></div>
-        <div class="stat-sub">${rangeStuds} studs ÷ 3.0</div>
       </div>
       <div class="guide-stat-card highlight">
         <div class="stat-label">Untargetable Pillar Height</div>
         <div class="stat-value">${targetImmuneH} <span class="unit">blocks</span></div>
-        <div class="stat-sub">Enemy shoots ground pillar</div>
       </div>
     </div>
   `;
@@ -180,12 +159,10 @@ function runCircleCalcLogic() {
       <div class="guide-stat-card highlight">
         <div class="stat-label">Min Block Edge Distance</div>
         <div class="stat-value">${layout.minActualDist.toFixed(3)} <span class="unit">blocks</span></div>
-        <div class="stat-sub">Strictly &gt; ${aoeBlocks.toFixed(3)}b (Zero Overlap)</div>
       </div>
       <div class="guide-stat-card highlight stat-immune">
         <div class="stat-label">Grid Bounding Footprint</div>
         <div class="stat-value">${layout.gridWidth} × ${layout.gridHeight} <span class="unit">blocks</span></div>
-        <div class="stat-sub">Ultra-Dense Discrete Grid Layout</div>
       </div>
     </div>
   `;
@@ -374,7 +351,6 @@ function renderBuildingGuide() {
 
           <div class="circle-canvas-wrapper" style="margin-top: 1rem; text-align: center;">
             <canvas id="circle-preview-canvas" width="340" height="340" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px;"></canvas>
-            <div class="stat-sub" style="margin-top: 0.3rem;">Discrete Roblox Grid Map (Orange = Center Pillar (0,0), Cyan = Pillar Block Cells [X,Z])</div>
           </div>
         </div>
 
@@ -396,13 +372,11 @@ function renderBuildingGuide() {
               <div class="quick-calc-col">
                 <div class="quick-val-title">Radius in Blocks</div>
                 <div id="quick-blocks-output" class="quick-val-num">8.333</div>
-                <div class="quick-val-sub">Range ÷ 3.0</div>
               </div>
               <div class="quick-calc-divider"></div>
               <div class="quick-calc-col">
                 <div class="quick-val-title">Total Diameter</div>
                 <div id="quick-diameter-output" class="quick-val-num">16.667</div>
-                <div class="quick-val-sub">Radius × 2</div>
               </div>
             </div>
           </div>

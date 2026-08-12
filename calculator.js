@@ -1,69 +1,29 @@
-function formatCrackers(val) {
-  const rounded = robloxLuaRound(val, 2);
-  return parseFloat(rounded.toFixed(2));
-}
+// Toy Defense - Lunchbox Yield Calculator & Inspector Script
+
+let settings = {
+  theme: "dark",
+};
+
 function initSettings() {
-  if (typeof loadWaveStrategies === "function") loadWaveStrategies();
-  const savedToys = localStorage.getItem("toyPassEnabled");
-  const toyCheckbox = document.getElementById("extra-toys-checkbox");
-  if (toyCheckbox) toyCheckbox.checked = savedToys === "true";
-  const savedCrackers = localStorage.getItem("crackerPassEnabled");
-  const crackerCheckbox = document.getElementById("extra-crackers-checkbox");
-  if (crackerCheckbox) crackerCheckbox.checked = savedCrackers === "true";
-  const savedGroup = localStorage.getItem("groupBonusEnabled");
-  const groupCheckbox = document.getElementById("group-bonus-checkbox");
-  if (groupCheckbox) groupCheckbox.checked = savedGroup === "true";
-  const savedPremium = localStorage.getItem("premiumBonusEnabled");
-  const premiumCheckbox = document.getElementById("premium-bonus-checkbox");
-  if (premiumCheckbox) premiumCheckbox.checked = savedPremium === "true";
-}
-function toggleExtraToysPass() {
-  const checkbox = document.getElementById("extra-toys-checkbox");
-  localStorage.setItem(
-    "toyPassEnabled",
-    checkbox ? (checkbox.checked ? "true" : "false") : "false",
-  );
-  updateCalculator();
-  if (typeof renderItemFinder === "function") renderItemFinder();
-  if (typeof renderWaveCalculator === "function") renderWaveCalculator();
-}
-function toggleExtraCrackersPass() {
-  const checkbox = document.getElementById("extra-crackers-checkbox");
-  localStorage.setItem(
-    "crackerPassEnabled",
-    checkbox ? (checkbox.checked ? "true" : "false") : "false",
-  );
-  updateCalculator();
-  if (typeof renderItemFinder === "function") renderItemFinder();
-  if (typeof renderWaveCalculator === "function") renderWaveCalculator();
-}
-function toggleGroupBonus() {
-  const checkbox = document.getElementById("group-bonus-checkbox");
-  localStorage.setItem(
-    "groupBonusEnabled",
-    checkbox ? (checkbox.checked ? "true" : "false") : "false",
-  );
-  updateCalculator();
-  if (typeof renderItemFinder === "function") renderItemFinder();
-  if (typeof renderWaveCalculator === "function") renderWaveCalculator();
-}
-function togglePremiumBonus() {
-  const checkbox = document.getElementById("premium-bonus-checkbox");
-  localStorage.setItem(
-    "premiumBonusEnabled",
-    checkbox ? (checkbox.checked ? "true" : "false") : "false",
-  );
-  updateCalculator();
-  if (typeof renderItemFinder === "function") renderItemFinder();
-  if (typeof renderWaveCalculator === "function") renderWaveCalculator();
-}
-function toggleSettingsPopup() {
-  const popup = document.getElementById("settings-popup");
-  if (popup) {
-    const isVis = popup.style.display === "block";
-    popup.style.display = isVis ? "none" : "block";
+  const saved = localStorage.getItem("td_calc_settings");
+  if (saved) {
+    try {
+      settings = JSON.parse(saved);
+    } catch (e) {}
   }
 }
+
+function saveSettings() {
+  localStorage.setItem("td_calc_settings", JSON.stringify(settings));
+}
+
+function toggleSettingsPopup() {
+  const popup = document.getElementById("settings-popup");
+  if (!popup) return;
+  const isShown = popup.style.display === "block";
+  popup.style.display = isShown ? "none" : "block";
+}
+
 document.addEventListener("click", (e) => {
   const popup = document.getElementById("settings-popup");
   const btn = document.getElementById("settings-btn");
@@ -71,8 +31,17 @@ document.addEventListener("click", (e) => {
     popup.style.display = "none";
   }
 });
+
 let selectedCrateName = "Toothpick";
 let currentTab = "calculator";
+
+function openItemInBrowser(itemName) {
+  if (typeof selectFinderItem === "function") {
+    selectFinderItem(itemName);
+  }
+  switchTab("item-finder");
+}
+
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll(".nav-tab").forEach((btn) => {
@@ -94,71 +63,19 @@ function switchTab(tab) {
     updateCalculator();
   }
 }
+
 function selectCrate(name) {
   selectedCrateName = name;
   updateCalculator();
 }
+
 function updateCalculator() {
   const budgetInput =
     parseFloat(document.getElementById("budget-input").value) || 0;
   const toyMult = document.getElementById("extra-toys-checkbox")?.checked
     ? 1.5
     : 1;
-  const grid = document.getElementById("crate-grid");
-  grid.innerHTML = crates
-    .map((c) => {
-      const times = Math.floor(
-        Math.round(budgetInput * 10000) / Math.round(c.cost * 10000),
-      );
-      const buyable = times > 0;
-      const isSelected = c.name === selectedCrateName;
-      const r_colors = {
-        Mythical: "var(--rarity-mythical)",
-        Legendary: "var(--rarity-legendary)",
-        Epic: "var(--rarity-epic)",
-        Rare: "var(--rarity-rare)",
-        Uncommon: "var(--rarity-uncommon)",
-        Common: "var(--rarity-common)",
-      };
-      const bestBadge = c.bestFor
-        ? `<div class="best-for-badge" style="border-color: ${r_colors[c.bestFor] || "#46b216"}; color: ${r_colors[c.bestFor] || "#46b216"};">BEST FOR ${c.bestFor.toUpperCase()}</div>`
-        : "";
-      return `
-        <div class="crate-tile ${isSelected ? "selected" : ""} ${buyable ? "" : "unaffordable"}" onclick="selectCrate('${c.name}')">
-          ${bestBadge}
-          <img src="${c.image}" alt="${c.name} Lunchbox" class="crate-tile-icon" />
-          <div class="crate-tile-name">${c.name} Lunchbox</div>
-          <div class="crate-tile-cost">
-            <i data-lucide="cookie" style="width:14px;height:14px;vertical-align:middle;display:inline-block;color:var(--secondary-color);"></i>${c.cost.toFixed(2)} | ${c.toys * toyMult} Toys
-          </div>
-          <span class="crate-buys-badge ${buyable ? "" : "zero"}">
-            ${buyable ? `${times}x BUYS` : "UNAFFORDABLE"}
-          </span>
-        </div>
-      `;
-    })
-    .join("");
-  if (window.lucide) lucide.createIcons();
-  renderInspector(budgetInput);
-}
-function renderInspector(budgetInput) {
-  const c = crates.find((x) => x.name === selectedCrateName) || crates[0];
-  const toyMult = document.getElementById("extra-toys-checkbox")?.checked
-    ? 1.5
-    : 1;
-  const times = Math.floor(
-    Math.round(budgetInput * 10000) / Math.round(c.cost * 10000),
-  );
-  const buyable = times > 0;
-  const totalToys = times * c.toys * toyMult;
-  const rarities = [
-    "Mythical",
-    "Legendary",
-    "Epic",
-    "Rare",
-    "Uncommon",
-    "Common",
-  ];
+
   const r_colors = {
     Mythical: "var(--rarity-mythical)",
     Legendary: "var(--rarity-legendary)",
@@ -167,12 +84,68 @@ function renderInspector(budgetInput) {
     Uncommon: "var(--rarity-uncommon)",
     Common: "var(--rarity-common)",
   };
-  const categories = [
-    { key: "soldier", label: "Expected Soldiers", color: "var(--cat-soldier)" },
-    { key: "trap", label: "Expected Traps", color: "var(--cat-trap)" },
-    { key: "block", label: "Expected Blocks", color: "var(--cat-block)" },
-  ];
+
+  const grid = document.getElementById("crate-grid");
+  grid.innerHTML = crates
+    .map((c) => {
+      const times = Math.floor(
+        Math.round(budgetInput * 10000) / Math.round(c.cost * 10000),
+      );
+      const isSelected = c.name === selectedCrateName;
+      const isBuyable = times > 0;
+      const bestForHTML = c.bestFor ? `<div class="best-for-badge" style="color: ${r_colors[c.bestFor] || "var(--primary-color)"}; border-color: ${r_colors[c.bestFor] || "var(--primary-color)"};">Best: ${c.bestFor}</div>` : "";
+
+      return `
+        <div class="crate-tile ${isSelected ? "selected" : ""} ${!isBuyable ? "unaffordable" : ""}" onclick="selectCrate('${c.name}')">
+          ${bestForHTML}
+          <img src="${c.image}" alt="${c.name}" class="crate-tile-icon" />
+          <div class="crate-tile-name">${c.name}</div>
+          <div class="crate-tile-cost"><i data-lucide="cookie" style="width:14px;height:14px;vertical-align:middle;display:inline-block;color:var(--secondary-color);"></i> ${c.cost.toFixed(2)} Crackers</div>
+          <div class="crate-buys-badge ${!isBuyable ? "zero" : ""}">${isBuyable ? times + "x Buys" : "Can't Afford"}</div>
+        </div>
+      `;
+    })
+    .join("");
+
+  const selectedCrate =
+    crates.find((c) => c.name === selectedCrateName) || crates[0];
+  renderLunchboxBreakdown(selectedCrate, budgetInput, toyMult);
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderLunchboxBreakdown(c, budgetInput, toyMult) {
   const panel = document.getElementById("inspector-panel");
+  if (!panel) return;
+
+  const times = Math.floor(
+    Math.round(budgetInput * 10000) / Math.round(c.cost * 10000),
+  );
+  const buyable = times > 0;
+  const totalToys = times * c.toys * toyMult;
+
+  const r_colors = {
+    Mythical: "var(--rarity-mythical)",
+    Legendary: "var(--rarity-legendary)",
+    Epic: "var(--rarity-epic)",
+    Rare: "var(--rarity-rare)",
+    Uncommon: "var(--rarity-uncommon)",
+    Common: "var(--rarity-common)",
+  };
+
+  const categories = [
+    { key: "soldier", label: "Soldiers", color: "var(--primary-color)" },
+    { key: "trap", label: "Traps", color: "#e056fd" },
+  ];
+
+  const rarities = [
+    "Mythical",
+    "Legendary",
+    "Epic",
+    "Rare",
+    "Uncommon",
+    "Common",
+  ];
+
   let breakdownHTML = "";
   if (buyable) {
     categories.forEach((cat) => {
@@ -188,13 +161,17 @@ function renderInspector(budgetInput) {
           const itemYield = totalToys * ((crate_pct * it.rate) / 100);
           catTotalExp += itemYield;
           if (itemYield > 0.001) {
+            const safeName = it.name.replace(/'/g, "\\'");
             groupItemsHTML += `
-              <div class="item-row" style="display: flex; align-items: center; justify-content: space-between; padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.03);">
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <img src="${it.image}" alt="${it.name}" style="width: 26px; height: 26px; object-fit: contain; border-radius: 6px; background: #000; border: 1px solid rgba(255,255,255,0.15);" />
-                  <span style="color: ${r_colors[r]}; font-weight: 700; font-size: 0.875rem;">${it.name}</span>
+              <div class="item-row" onclick="openItemInBrowser('${safeName}')" title="Click to view ${it.name} in Item Browser">
+                <div class="item-row-left">
+                  <img src="${it.image}" alt="${it.name}" class="item-row-img" />
+                  <span class="item-row-name" style="color: ${r_colors[r]};">
+                    ${it.name}
+                    <i data-lucide="external-link"></i>
+                  </span>
                 </div>
-                <span style="font-weight: 800; font-size: 0.9rem; color: #ffffff;">${itemYield.toFixed(2)}</span>
+                <span class="item-row-yield">${itemYield.toFixed(2)}</span>
               </div>
             `;
           }
@@ -214,6 +191,7 @@ function renderInspector(budgetInput) {
       }
     });
   }
+
   panel.innerHTML = `
     <div class="inspector-header">
       <div style="display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.5rem;">
@@ -240,16 +218,22 @@ function renderInspector(budgetInput) {
       ${
         buyable
           ? breakdownHTML
-          : `<div style="text-align: center; color: var(--text-sub); padding: 3rem 1rem;">
-              <i data-lucide="alert-circle" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 0.75rem;"></i>
-              <div style="font-weight: 700; color: #ffffff; margin-bottom: 0.25rem;">Insufficient Crackers</div>
-              <div>Enter a higher Crackers amount to view item yields for ${c.name} Lunchbox.</div>
+          : `<div style="text-align: center; color: var(--text-sub); padding: 2.5rem 1rem;">
+              <i data-lucide="alert-circle" style="width: 44px; height: 44px; color: var(--text-muted); margin-bottom: 0.75rem;"></i>
+              <div style="font-weight: 800; color: #ffffff; margin-bottom: 0.35rem; font-size: 1.05rem;">Insufficient Crackers</div>
+              <div style="font-size: 0.88rem; color: var(--text-sub); margin-bottom: 0.85rem; max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.4;">
+                Enter a higher Crackers amount in the <strong>Current Crackers <i data-lucide="cookie" style="width:14px;height:14px;vertical-align:middle;display:inline-block;color:var(--secondary-color);"></i> input (top right of the page)</strong> to view item yields for <strong>${c.name} Lunchbox</strong>.
+              </div>
+              <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255, 159, 67, 0.15); border: 1px solid var(--secondary-color); color: var(--secondary-color); padding: 0.45rem 0.85rem; border-radius: 8px; font-size: 0.8rem; font-weight: 800; cursor: pointer;" onclick="document.getElementById('budget-input')?.focus()">
+                <i data-lucide="arrow-up-right" style="width:14px;height:14px;"></i> Click to focus Crackers field (Top Right ↗)
+              </div>
             </div>`
       }
     </div>
   `;
   if (window.lucide) lucide.createIcons();
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   initSettings();
   updateCalculator();
