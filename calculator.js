@@ -135,6 +135,7 @@ function renderLunchboxBreakdown(c, budgetInput, toyMult) {
   const categories = [
     { key: "soldier", label: "Soldiers", color: "var(--primary-color)" },
     { key: "trap", label: "Traps", color: "#e056fd" },
+    { key: "block", label: "Blocks", color: "#00d2d3" },
   ];
 
   const rarities = [
