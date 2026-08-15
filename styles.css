@@ -1300,9 +1300,7 @@ select {
   box-sizing: border-box !important;
 }
 
-/* ==========================================================================
-   Building Guide Tab Styles
-   ========================================================================== */
+
 .guide-page-layout {
   display: flex;
   flex-direction: column;
@@ -1620,7 +1618,7 @@ select {
   color: var(--primary-color);
 }
 
-/* Quick Converter & Soldier Reach Styles */
+
 .quick-calc-display {
   display: flex;
   align-items: center;
@@ -1708,7 +1706,7 @@ select {
   color: #72f038;
 }
 
-/* Height Breakdown Curve & Status Pills */
+
 .height-breakdown-wrapper {
   margin-top: 1.25rem;
 }

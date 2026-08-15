@@ -82,7 +82,7 @@ function renderItemFinder() {
             const w = item.weight !== undefined ? item.weight : item.stats?.weight;
             return w && w > 0 ? dps / w : 0;
           }
-          return 0; // Single-use items rank below sustained DPS
+          return 0; 
         };
         const dwA = calcDpsPerWeight(a);
         const dwB = calcDpsPerWeight(b);
@@ -320,7 +320,6 @@ function renderItemDetail(item, budgetInput, toyMult) {
   if (window.lucide) lucide.createIcons();
 }
 
-// Runnable self-check (Ponytail check)
 (function selfCheckItemFinder() {
   if (typeof itemDatabase !== "undefined" && itemDatabase.length > 0) {
     const testItem = itemDatabase[0];

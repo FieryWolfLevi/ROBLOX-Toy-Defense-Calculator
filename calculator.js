@@ -1,4 +1,4 @@
-// Toy Defense - Lunchbox Yield Calculator & Inspector Script
+
 
 let settings = {
   theme: "dark",

@@ -216,7 +216,7 @@ function renderWaveCalculator() {
             </div>
           </div>
         </div>
-        <!-- Vertical Bar Stat Blocks with Icon Labels -->
+        
         <div class="wave-stats-grid">
           <div class="wave-stat-box">
             <div class="wave-stat-label">${cookieIconHeader} / RUN</div>

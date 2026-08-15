@@ -1,6 +1,5 @@
-// Toy Defense - Building Tips & Guide Script
 
-// Exact Roblox grid unit conversion: 1 Block = 3.0 Roblox Studs (0.3333x)
+
 const STUD_CONVERSION_FACTOR = 1 / 3;
 
 function studsToBlocks(rangeStuds) {
@@ -21,15 +20,89 @@ function topEdgeReach(rangeStuds, unitHeight = 2.0) {
 
 function directTargetImmunityHeight(rangeStuds, enemyDepthZ = 1.0) {
   const rEff = studsToBlocks(rangeStuds) - 0.5;
-  const xMin = 0.5 + (enemyDepthZ / 2.0); // Min horizontal distance enemy center can reach
+  const xMin = 0.5 + (enemyDepthZ / 2.0); 
   if (xMin >= rEff) return 0;
   const maxVertReach = Math.sqrt(rEff * rEff - xMin * xMin);
   return Math.max(0, Math.ceil(maxVertReach));
 }
 
-// ----------------------------------------------------
-// Canvas Zoom & Pan Controller
-// ----------------------------------------------------
+const WEIGHT_BASE_DEFAULT = 300;
+const WEIGHT_STEP = 30;
+
+const WEIGHT_MULT = 1.169025;
+
+function calcWeightUpgradeCost(upgradeIndex) {
+  if (upgradeIndex <= 0) return 0;
+  return 0.1 * Math.pow(WEIGHT_MULT, upgradeIndex - 1);
+}
+
+function calcTotalWeightCost(upgradesCount) {
+  if (upgradesCount <= 0) return 0;
+  return 0.1 * (Math.pow(WEIGHT_MULT, upgradesCount) - 1) / (WEIGHT_MULT - 1);
+}
+
+function formatCrackerNumber(num) {
+  if (num < 1) {
+    return (Math.floor(num * 100 + 0.0001) / 100).toFixed(2);
+  }
+  if (num < 10) {
+    return (Math.round(num * 100) / 100).toFixed(2);
+  }
+  if (num < 100) {
+    return (Math.round(num * 10) / 10).toFixed(1);
+  }
+  if (num < 1000) {
+    return Math.round(num).toString();
+  }
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(2) + "M";
+  }
+  if (num >= 100000) {
+    return Math.round(num / 1000) + "K";
+  }
+  if (num >= 10000) {
+    return (num / 1000).toFixed(1) + "K";
+  }
+  return (num / 1000).toFixed(2) + "K";
+}
+
+function updateWeightCalc() {
+  const input = document.getElementById("target-weight-input");
+  const vipCheckbox = document.getElementById("weight-vip-pass");
+  const resultsBox = document.getElementById("weight-calc-results");
+  if (!input || !resultsBox) return;
+
+  const hasVip = vipCheckbox ? vipCheckbox.checked : false;
+  const baseWeight = WEIGHT_BASE_DEFAULT + (hasVip ? 150 : 0);
+
+  const rawW = parseInt(input.value) || baseWeight;
+  const currentW = Math.max(baseWeight, rawW);
+
+  const upgradesCompleted = Math.floor((currentW - baseWeight) / WEIGHT_STEP);
+  const effectiveWeight = baseWeight + upgradesCompleted * WEIGHT_STEP;
+  const nextTargetWeight = effectiveWeight + WEIGHT_STEP;
+
+  const nextTierIndex = upgradesCompleted + 1;
+  const nextUpgradeCost = calcWeightUpgradeCost(nextTierIndex);
+  const totalCumulativeCost = calcTotalWeightCost(upgradesCompleted);
+
+  resultsBox.innerHTML = `
+    <div class="guide-stats-grid" style="margin-top: 1rem;">
+      <div class="guide-stat-card highlight" style="border-color: #ffd32a;">
+        <div class="stat-label" style="color: #ffd32a;">Upgrade Cost (${effectiveWeight} → ${nextTargetWeight})</div>
+        <div class="stat-value" style="color: #ffd32a;">${formatCrackerNumber(nextUpgradeCost)} <span class="unit">Crackers</span></div>
+      </div>
+      <div class="guide-stat-card highlight stat-immune">
+        <div class="stat-label">Total Spent So Far</div>
+        <div class="stat-value">${formatCrackerNumber(totalCumulativeCost)} <span class="unit">Crackers (from ${baseWeight})</span></div>
+      </div>
+      <div class="guide-stat-card">
+        <div class="stat-label">Completed Upgrades</div>
+        <div class="stat-value">${upgradesCompleted} <span class="unit">tiers (${effectiveWeight} Max Weight)</span></div>
+      </div>
+    </div>
+  `;
+}
 
 const canvasViewStates = {
   "circle-preview-canvas": { zoom: 1.0, panX: 0, panY: 0, isDragging: false, startX: 0, startY: 0 },
@@ -80,7 +153,6 @@ function attachCanvasInteractions(canvasId) {
 
   canvas.style.cursor = "grab";
 
-  // Mouse Wheel Zoom
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
     const delta = e.deltaY < 0 ? 0.15 : -0.15;
@@ -89,7 +161,6 @@ function attachCanvasInteractions(canvasId) {
     triggerCanvasRedraw(canvasId);
   }, { passive: false });
 
-  // Mouse Drag Pan
   canvas.addEventListener("mousedown", (e) => {
     view.isDragging = true;
     view.startX = e.clientX - view.panX;
@@ -111,7 +182,6 @@ function attachCanvasInteractions(canvasId) {
     }
   });
 
-  // Touch Support for Mobile / Tablets
   let touchStartDist = 0;
   canvas.addEventListener("touchstart", (e) => {
     if (e.touches.length === 1) {
@@ -151,11 +221,6 @@ function attachCanvasInteractions(canvasId) {
   });
 }
 
-// ----------------------------------------------------
-// Event Handlers & Live Updates
-// ----------------------------------------------------
-
-// Quick Converter: Range to Blocks
 function updateQuickRangeConverter() {
   const input = document.getElementById("quick-studs-input");
   const outputBlocks = document.getElementById("quick-blocks-output");
@@ -168,7 +233,6 @@ function updateQuickRangeConverter() {
   outputDiameter.textContent = (blocks * 2).toFixed(3);
 }
 
-// Soldier Size & Reach Calculator
 function updateSoldierReachCalc() {
   const rangeInput = document.getElementById("soldier-range-input");
   const sizeXInput = document.getElementById("soldier-size-x");
@@ -210,7 +274,6 @@ function updateSoldierReachCalc() {
   `;
 }
 
-// Vertical Immunity Calculator
 function updateGuideCalc() {
   const rangeInput = document.getElementById("guide-range-input");
   const enemyXInput = document.getElementById("guide-enemy-x");
@@ -253,7 +316,6 @@ function updateGuideCalc() {
   if (window.lucide) window.lucide.createIcons();
 }
 
-// Maximum Density 2D Grid Shape Builder & Anti-AOE Spacing Calculator
 let circleCalcDebounceTimer = null;
 
 function updateCircleCalc() {
@@ -276,7 +338,6 @@ function runCircleCalcLogic() {
   const aoeBlocks = studsToBlocks(aoeStuds);
   const showAoeBubbles = showAoeCheckbox ? showAoeCheckbox.checked : true;
 
-  // Compute maximum density grid packing layout with exact minimum tile clearance
   const layout = generateMaxDensityPackedLayout(requestedPillars, aoeBlocks);
 
   resultContainer.innerHTML = `
@@ -292,12 +353,10 @@ function runCircleCalcLogic() {
     </div>
   `;
 
-  // Draw 2D Discrete Roblox Grid Map
   drawDiscreteGridPreview(canvas, layout.gridSpan, aoeBlocks, layout.coords, showAoeBubbles);
   if (window.lucide) window.lucide.createIcons();
 }
 
-// Minimum distance from center (cx, cz) to closest point on 1x1 square block cell (bx, bz)
 function distanceToSquareBlockCell(cx, cz, bx, bz) {
   const minX = bx - 0.5;
   const maxX = bx + 0.5;
@@ -310,12 +369,10 @@ function distanceToSquareBlockCell(cx, cz, bx, bz) {
   return Math.sqrt(dx * dx + dz * dz);
 }
 
-// Ultra-compact 2D discrete grid packing algorithm evaluating exact integer block cell distances
 function generateMaxDensityPackedLayout(numPillars, aoeBlocks) {
-  const minRequiredDist = aoeBlocks - 0.0001; // >= AOE Blocks
+  const minRequiredDist = aoeBlocks - 0.0001; 
   const coords = [];
 
-  // Expand in radial grid rings from (0,0) outwards
   for (let ring = 0; ring <= 50 && coords.length < numPillars; ring++) {
     const candidatePoints = [];
 
@@ -327,7 +384,6 @@ function generateMaxDensityPackedLayout(numPillars, aoeBlocks) {
       }
     }
 
-    // Sort candidate points by radial distance from origin (0,0)
     candidatePoints.sort((a, b) => a.distSq - b.distSq);
 
     for (const pt of candidatePoints) {
@@ -406,7 +462,6 @@ function drawDiscreteGridPreview(canvas, gridSpan, aoeBlocks, pillarCoords, show
   const originX = Math.floor(w / 2);
   const originY = Math.floor(h / 2);
 
-  // 1. Draw Grid Background Blocks
   for (let gx = -gridSpan; gx <= gridSpan; gx++) {
     for (let gz = -gridSpan; gz <= gridSpan; gz++) {
       const px = originX + gx * cellSize - cellSize / 2;
@@ -418,12 +473,10 @@ function drawDiscreteGridPreview(canvas, gridSpan, aoeBlocks, pillarCoords, show
     }
   }
 
-  // 2. Draw Pillar Grid Blocks & AOE Splash Areas
   pillarCoords.forEach(coord => {
     const ppx = originX + coord.x * cellSize;
     const ppy = originY + coord.z * cellSize;
 
-    // AOE Splash Radius Circle (only if showAoeBubbles is enabled)
     if (showAoeBubbles && aoeBlocks > 0) {
       ctx.fillStyle = "rgba(235, 77, 75, 0.14)";
       ctx.strokeStyle = "rgba(235, 77, 75, 0.5)";
@@ -434,7 +487,6 @@ function drawDiscreteGridPreview(canvas, gridSpan, aoeBlocks, pillarCoords, show
       ctx.stroke();
     }
 
-    // Pillar Block Cell Highlight (Orange highlight if at (0,0), Cyan for outer pillars)
     const isCenterPillar = (coord.x === 0 && coord.z === 0);
     const bpx = ppx - cellSize / 2;
     const bpy = ppy - cellSize / 2;
@@ -447,10 +499,6 @@ function drawDiscreteGridPreview(canvas, gridSpan, aoeBlocks, pillarCoords, show
 
   ctx.restore();
 }
-
-// ----------------------------------------------------
-// Tan Spawn Ring Calculator & Visualizer
-// ----------------------------------------------------
 
 let tanCalcDebounceTimer = null;
 function updateTanSpawnCalc() {
@@ -474,7 +522,6 @@ function applyMinePreset() {
   updateTanSpawnCalc();
 }
 
-// High-circularity 8-way symmetric Euclidean raster circle
 function getCircularRingBlocks(radius) {
   const blocks = new Map();
   const rCeil = Math.ceil(radius);
@@ -498,19 +545,22 @@ function getCircularRingBlocks(radius) {
   return Array.from(blocks.values());
 }
 
-// Calculate discrete 1x1 block cells that have >= 50% geometric area coverage inside the trap ring
 function get50PercentCoverageTrapBlocks(rInner, rOuter) {
   const blocks = [];
-  const rMax = Math.ceil(rOuter + 1);
+  const maxTrapR = rOuter + 1.0; 
+  const rCeil = Math.ceil(maxTrapR);
   const samples = [-0.33, 0, 0.33];
 
-  for (let x = -rMax; x <= rMax; x++) {
-    for (let z = -rMax; z <= rMax; z++) {
+  for (let x = -rCeil; x <= rCeil; x++) {
+    for (let z = -rCeil; z <= rCeil; z++) {
+      const centerDist = Math.hypot(x, z);
+      if (centerDist > maxTrapR + 0.1) continue;
+
       let insideCount = 0;
       for (const dx of samples) {
         for (const dz of samples) {
-          const d = Math.sqrt((x + dx) ** 2 + (z + dz) ** 2);
-          if (d >= rInner && d <= rOuter) {
+          const d = Math.hypot(x + dx, z + dz);
+          if (d >= rInner && d <= maxTrapR + 0.05) {
             insideCount++;
           }
         }
@@ -523,19 +573,17 @@ function get50PercentCoverageTrapBlocks(rInner, rOuter) {
   return blocks;
 }
 
-// Calculate optimal, evenly-distributed mine placement positions STRICTLY WITHIN the Trap Tiles
-function getOptimalMinePositionsInTrapTiles(mineCount, rInner, rOuter, trapBlocks) {
-  if (mineCount <= 0 || !trapBlocks || trapBlocks.length === 0) return [];
+function getOptimalMinePositionsInTrapTiles(mineCount, ringBlocks) {
+  if (mineCount <= 0 || !ringBlocks || ringBlocks.length === 0) return [];
   const mines = [];
   const used = new Set();
-  const targetR = (rInner + rOuter) / 2;
 
   for (let i = 0; i < mineCount; i++) {
     const angle = (2 * Math.PI * i) / mineCount;
     let best = null;
     let bestScore = Infinity;
 
-    trapBlocks.forEach(pt => {
+    ringBlocks.forEach(pt => {
       const key = `${pt.x},${pt.z}`;
       if (used.has(key)) return;
 
@@ -543,13 +591,8 @@ function getOptimalMinePositionsInTrapTiles(mineCount, rInner, rOuter, trapBlock
       let angleDiff = Math.abs(tileAngle - angle);
       while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - 2 * Math.PI);
 
-      const r = Math.hypot(pt.x, pt.z);
-      const rDiff = Math.abs(r - targetR);
-
-      // Score prioritizes exact radial angle alignment while favoring middle radius of the trap band
-      const score = angleDiff * 12 + rDiff;
-      if (score < bestScore) {
-        bestScore = score;
+      if (angleDiff < bestScore) {
+        bestScore = angleDiff;
         best = pt;
       }
     });
@@ -572,6 +615,7 @@ function runTanSpawnCalcLogic() {
   const showCrosshairCheckbox = document.getElementById("tan-show-crosshair");
   const showHaloCheckbox = document.getElementById("tan-show-trap-halo");
   const showMinesCheckbox = document.getElementById("tan-show-mines");
+  const showMineAoeCheckbox = document.getElementById("tan-show-mine-aoe");
   const resultsBox = document.getElementById("tan-spawn-calc-results");
   const canvas = document.getElementById("tan-spawn-canvas");
 
@@ -579,7 +623,7 @@ function runTanSpawnCalcLogic() {
   attachCanvasInteractions("tan-spawn-canvas");
 
   const soldierRange = Math.max(1, parseFloat(rangeInput.value) || 18);
-  const enemyRange = Math.max(0, parseFloat(enemyRangeInput?.value) || 50);
+  const enemyRange = Math.max(0, parseFloat(enemyRangeInput?.value) || 57);
   const mineCount = Math.max(0, parseInt(mineCountInput?.value) || 0);
   const mineAoeStuds = Math.max(0, parseFloat(mineAoeInput?.value) || 0);
   const mineAoeBlocks = mineAoeStuds / 3.0;
@@ -587,29 +631,22 @@ function runTanSpawnCalcLogic() {
   const soldierRangeBlocks = soldierRange / 3.0;
   const enemyRangeBlocks = enemyRange / 3.0;
 
-  // Dynamic spawn offset based on Tan enemy range:
-  // Range 20 Tan -> 12 blocks, Range 45 Tan -> 15 blocks
-  let offsetBlocks = 12;
-  if (enemyRange <= 20) {
-    offsetBlocks = Math.max(8, Math.round(12 - (20 - enemyRange) * 0.2));
-  } else {
-    offsetBlocks = Math.round(12 + (enemyRange - 20) * (3 / 25));
-  }
+  const offsetBlocks = Math.round(5 + (enemyRange - 2) * (13 / 55));
 
-  const spawnRadiusBlocks = Math.round(soldierRangeBlocks + offsetBlocks);
+  const spawnRadiusBlocks = Math.max(11, Math.round(soldierRangeBlocks + offsetBlocks));
   const innerTrapRadius = Math.max(0, enemyRangeBlocks);
   const outerTrapRadius = spawnRadiusBlocks;
   const gridDiameter = spawnRadiusBlocks * 2 + 1;
 
+  const innerRingBlocks = innerTrapRadius > 0 ? getCircularRingBlocks(innerTrapRadius) : [];
   const ringBlocks = getCircularRingBlocks(spawnRadiusBlocks);
   const trapBlocks = get50PercentCoverageTrapBlocks(innerTrapRadius, outerTrapRadius);
-  const minePositions = getOptimalMinePositionsInTrapTiles(mineCount, innerTrapRadius, outerTrapRadius, trapBlocks);
+  const minePositions = getOptimalMinePositionsInTrapTiles(mineCount, ringBlocks);
 
   const showRange = showRangeCheckbox ? showRangeCheckbox.checked : true;
   const showCrosshair = showCrosshairCheckbox ? showCrosshairCheckbox.checked : true;
   const showHalo = showHaloCheckbox ? showHaloCheckbox.checked : true;
   const showMines = showMinesCheckbox ? showMinesCheckbox.checked : true;
-  const showMineAoeCheckbox = document.getElementById("tan-show-mine-aoe");
   const showMineAoe = showMineAoeCheckbox ? showMineAoeCheckbox.checked : true;
 
   resultsBox.innerHTML = `
@@ -627,17 +664,17 @@ function runTanSpawnCalcLogic() {
         <div class="stat-value" style="color: #e056fd;">${trapBlocks.length} <span class="unit">blocks</span></div>
       </div>
       <div class="guide-stat-card highlight" style="border-color: #ffd32a;">
-        <div class="stat-label" style="color: #ffd32a;">Mines Placed in Trap Tiles</div>
+        <div class="stat-label" style="color: #ffd32a;">Mines on Spawn Line</div>
         <div class="stat-value" style="color: #ffd32a;">${minePositions.length} <span class="unit">mines (${mineAoeBlocks.toFixed(1)} blk AOE)</span></div>
       </div>
     </div>
   `;
 
-  drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, spawnRadiusBlocks, ringBlocks, trapBlocks, minePositions, mineAoeBlocks, showRange, showCrosshair, showHalo, showMines, showMineAoe);
+  drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, spawnRadiusBlocks, innerRingBlocks, ringBlocks, trapBlocks, minePositions, mineAoeBlocks, showRange, showCrosshair, showHalo, showMines, showMineAoe);
   if (window.lucide) window.lucide.createIcons();
 }
 
-function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, spawnRadiusBlocks, ringBlocks, trapBlocks, minePositions, mineAoeBlocks, showSoldierRange = true, showCrosshair = true, showTrapHalo = true, showMines = true, showMineAoe = true) {
+function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, spawnRadiusBlocks, innerRingBlocks, ringBlocks, trapBlocks, minePositions, mineAoeBlocks, showSoldierRange = true, showCrosshair = true, showTrapHalo = true, showMines = true, showMineAoe = true) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -657,7 +694,6 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
   const originX = Math.floor(w / 2);
   const originY = Math.floor(h / 2);
 
-  // 1. Draw Grid Background Blocks
   for (let gx = -gridSpan; gx <= gridSpan; gx++) {
     for (let gz = -gridSpan; gz <= gridSpan; gz++) {
       const px = originX + gx * cellSize - cellSize / 2;
@@ -669,9 +705,11 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
     }
   }
 
-  // 2. Draw Discrete Trap Placement Blocks (>= 50% coverage)
   if (showTrapHalo && trapBlocks.length > 0) {
+    const innerSet = new Set((innerRingBlocks || []).map(p => `${p.x},${p.z}`));
+
     trapBlocks.forEach(pt => {
+      if (innerSet.has(`${pt.x},${pt.z}`)) return; 
       const bpx = originX + pt.x * cellSize - cellSize / 2;
       const bpy = originY + pt.z * cellSize - cellSize / 2;
 
@@ -681,9 +719,19 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
       ctx.lineWidth = 0.75;
       ctx.strokeRect(bpx, bpy, cellSize, cellSize);
     });
+
+    (innerRingBlocks || []).forEach(pt => {
+      const bpx = originX + pt.x * cellSize - cellSize / 2;
+      const bpy = originY + pt.z * cellSize - cellSize / 2;
+
+      ctx.fillStyle = "#be2edd"; 
+      ctx.fillRect(bpx, bpy, cellSize, cellSize);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(bpx, bpy, cellSize, cellSize);
+    });
   }
 
-  // 3. Draw Crosshair Axes if enabled
   if (showCrosshair) {
     for (let gx = -spawnRadiusBlocks; gx <= spawnRadiusBlocks; gx++) {
       if (gx === 0) continue;
@@ -699,10 +747,8 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
     }
   }
 
-  // 4. Draw Crisp Vector Guide Circles (High Circularity)
   const innerTrapRadius = Math.max(0, enemyRangeBlocks);
 
-  // Inner trap engagement boundary guide
   if (showTrapHalo && innerTrapRadius > 0) {
     ctx.save();
     ctx.strokeStyle = "rgba(224, 86, 253, 0.85)";
@@ -714,7 +760,6 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
     ctx.restore();
   }
 
-  // Soldier Attack Range Zone Circle
   if (showSoldierRange && soldierRangeBlocks > 0) {
     ctx.fillStyle = "rgba(70, 178, 22, 0.14)";
     ctx.strokeStyle = "rgba(70, 178, 22, 0.7)";
@@ -725,14 +770,12 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
     ctx.stroke();
   }
 
-  // Outer Tan Spawn Guide Circle (Smooth Circular Stroke)
   ctx.strokeStyle = "rgba(255, 71, 87, 0.8)";
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.arc(originX, originY, spawnRadiusBlocks * cellSize, 0, 2 * Math.PI);
   ctx.stroke();
 
-  // 5. Draw High-Circularity Symmetric Discrete Red Pixel Spawn Ring Blocks
   ringBlocks.forEach(pt => {
     const bpx = originX + pt.x * cellSize - cellSize / 2;
     const bpy = originY + pt.z * cellSize - cellSize / 2;
@@ -745,9 +788,8 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
     ctx.strokeRect(bpx, bpy, cellSize, cellSize);
   });
 
-  // 6. Draw Optimal Mine Positions & AOE Bubbles (strictly inside Trap Tiles)
   if (showMines && minePositions.length > 0) {
-    // A. Draw Mine AOE Splash Radius Bubbles
+
     if (showMineAoe && mineAoeBlocks > 0) {
       minePositions.forEach(m => {
         const mpx = originX + m.x * cellSize;
@@ -763,7 +805,6 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
       });
     }
 
-    // B. Draw Discrete Mine Tiles (Bright Gold Marker)
     minePositions.forEach(m => {
       const mbpx = originX + m.x * cellSize - cellSize / 2;
       const mbpy = originY + m.z * cellSize - cellSize / 2;
@@ -776,7 +817,6 @@ function drawTanSpawnRingPreview(canvas, soldierRangeBlocks, enemyRangeBlocks, s
     });
   }
 
-  // 7. Draw Center Soldier Marker at (0,0)
   const cpx = originX - cellSize / 2;
   const cpy = originY - cellSize / 2;
   ctx.fillStyle = "#ff9f43";
@@ -792,57 +832,18 @@ function renderBuildingGuide() {
   const container = document.getElementById("view-building-guide");
   if (!container) return;
 
-  // Only populate DOM if empty to avoid unnecessary re-renders
   if (container.children.length === 0) {
     container.innerHTML = `
       <div class="guide-page-layout">
+
         
-        <!-- Top Card: AOE Pillar Spacing Helper -->
         <div class="guide-section-card calc-card">
-          <div class="guide-card-header">
-            <i data-lucide="disc" class="header-icon"></i>
-            <h2>AOE Pillar Spacing Helper</h2>
-          </div>
-
-          <div class="guide-input-group">
-            <div class="guide-input-box">
-              <label for="circle-pillars-input">Pillar Count:</label>
-              <input type="number" id="circle-pillars-input" value="5" min="1" step="1" oninput="updateCircleCalc()" placeholder="e.g. 5" />
-            </div>
-
-            <div class="guide-input-box">
-              <label for="circle-aoe-input">Enemy AOE Radius:</label>
-              <input type="number" id="circle-aoe-input" value="6" min="0" max="200" step="1" oninput="updateCircleCalc()" placeholder="e.g. 6" />
-            </div>
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem;">
-            <input type="checkbox" id="circle-show-aoe" checked onchange="updateCircleCalc()" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color);" />
-            <label for="circle-show-aoe" style="cursor: pointer; font-size: 0.9rem; font-weight: 600; color: #ddd;">Show AOE Splash Bubbles on Canvas</label>
-          </div>
-
-          <div id="circle-calc-results"></div>
-
-          <div class="circle-canvas-wrapper" style="margin-top: 1rem; text-align: center; position: relative; display: inline-block; width: 100%;">
-            <!-- Floating Zoom Toolbar -->
-            <div class="canvas-zoom-toolbar" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 4px; background: rgba(15, 20, 30, 0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px 6px; z-index: 10;">
-              <button onclick="zoomCanvas('circle-preview-canvas', 0.25)" title="Zoom In" style="background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
-              <span id="circle-preview-canvas-zoom-label" style="font-size: 0.78rem; font-weight: 700; color: #fff; min-width: 40px; text-align: center;">100%</span>
-              <button onclick="zoomCanvas('circle-preview-canvas', -0.25)" title="Zoom Out" style="background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;">−</button>
-              <button onclick="resetCanvasZoom('circle-preview-canvas')" title="Reset Zoom" style="background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #aaa; width: 26px; height: 26px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">↺</button>
-            </div>
-            <canvas id="circle-preview-canvas" width="360" height="360" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; max-width: 100%; height: auto;"></canvas>
-          </div>
-        </div>
-
-        <!-- Tan Spawn Ring Visualizer Card -->
-        <div class="guide-section-card calc-card" style="margin-top: 1.5rem;">
           <div class="guide-card-header">
             <i data-lucide="crosshair" class="header-icon" style="color: #ff4757;"></i>
             <h2>Tan Spawn Ring & Mine Placement Optimizer</h2>
           </div>
 
-          <!-- Soldier & Enemy Range Inputs -->
+          
           <div class="guide-input-group">
             <div class="guide-input-box">
               <label for="tan-soldier-range-input">Center Soldier Range:</label>
@@ -851,11 +852,11 @@ function renderBuildingGuide() {
 
             <div class="guide-input-box">
               <label for="tan-enemy-range-input">Tan Enemy Range:</label>
-              <input type="number" id="tan-enemy-range-input" value="50" min="0" max="250" step="1" oninput="updateTanSpawnCalc()" placeholder="e.g. 50" />
+              <input type="number" id="tan-enemy-range-input" value="57" min="0" max="250" step="1" oninput="updateTanSpawnCalc()" placeholder="e.g. 57 (Wave 49)" />
             </div>
           </div>
 
-          <!-- Mine Placement Inputs -->
+          
           <div class="guide-input-group" style="margin-top: 0.5rem; background: rgba(255, 211, 42, 0.04); border: 1px solid rgba(255, 211, 42, 0.2); border-radius: 8px; padding: 0.65rem 0.85rem;">
             <div class="guide-input-box" style="margin-bottom: 0;">
               <label for="tan-mine-count-input" style="color: #ffd32a;">Mine Count (Even Spacing):</label>
@@ -868,7 +869,7 @@ function renderBuildingGuide() {
             </div>
           </div>
 
-          <!-- Presets Row -->
+          
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.65rem; flex-wrap: wrap;">
             <div class="guide-input-box" style="flex: 1; min-width: 180px; margin-bottom: 0;">
               <label for="tan-soldier-preset-select" style="font-size: 0.78rem;">Soldier Preset:</label>
@@ -896,7 +897,7 @@ function renderBuildingGuide() {
             </div>
           </div>
 
-          <!-- Toggles Row -->
+          
           <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.85rem; flex-wrap: wrap;">
             <label style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #ffd32a;">
               <input type="checkbox" id="tan-show-mines" checked onchange="updateTanSpawnCalc()" style="accent-color: #ffd32a;" /> Show Mines
@@ -918,7 +919,7 @@ function renderBuildingGuide() {
           <div id="tan-spawn-calc-results"></div>
 
           <div class="circle-canvas-wrapper" style="margin-top: 1rem; text-align: center; position: relative; display: inline-block; width: 100%;">
-            <!-- Floating Zoom Toolbar -->
+            
             <div class="canvas-zoom-toolbar" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 4px; background: rgba(15, 20, 30, 0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px 6px; z-index: 10;">
               <button onclick="zoomCanvas('tan-spawn-canvas', 0.25)" title="Zoom In" style="background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
               <span id="tan-spawn-canvas-zoom-label" style="font-size: 0.78rem; font-weight: 700; color: #fff; min-width: 40px; text-align: center;">100%</span>
@@ -929,10 +930,10 @@ function renderBuildingGuide() {
           </div>
         </div>
 
-        <!-- Middle Row: Range-to-Block & Soldier Size Calculators -->
+        
         <div class="guide-grid-cards">
+
           
-          <!-- Quick Converter Card -->
           <div class="guide-section-card calc-card">
             <div class="guide-card-header">
               <i data-lucide="arrow-right-left" class="header-icon"></i>
@@ -956,7 +957,7 @@ function renderBuildingGuide() {
             </div>
           </div>
 
-          <!-- Soldier Dimensions Reach Calculator -->
+          
           <div class="guide-section-card calc-card">
             <div class="guide-card-header">
               <i data-lucide="box" class="header-icon"></i>
@@ -984,13 +985,51 @@ function renderBuildingGuide() {
 
         </div>
 
-        <!-- Bottom Row: Vertical Immunity Calculator Card -->
+        
+        <div class="guide-section-card calc-card">
+          <div class="guide-card-header">
+            <i data-lucide="disc" class="header-icon"></i>
+            <h2>AOE Pillar Spacing Helper</h2>
+          </div>
+
+          <div class="guide-input-group">
+            <div class="guide-input-box">
+              <label for="circle-pillars-input">Pillar Count:</label>
+              <input type="number" id="circle-pillars-input" value="5" min="1" step="1" oninput="updateCircleCalc()" placeholder="e.g. 5" />
+            </div>
+
+            <div class="guide-input-box">
+              <label for="circle-aoe-input">Enemy AOE Radius:</label>
+              <input type="number" id="circle-aoe-input" value="6" min="0" max="200" step="1" oninput="updateCircleCalc()" placeholder="e.g. 6" />
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem;">
+            <input type="checkbox" id="circle-show-aoe" checked onchange="updateCircleCalc()" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-color);" />
+            <label for="circle-show-aoe" style="cursor: pointer; font-size: 0.9rem; font-weight: 600; color: #ddd;">Show AOE Splash Bubbles on Canvas</label>
+          </div>
+
+          <div id="circle-calc-results"></div>
+
+          <div class="circle-canvas-wrapper" style="margin-top: 1rem; text-align: center; position: relative; display: inline-block; width: 100%;">
+            
+            <div class="canvas-zoom-toolbar" style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 4px; background: rgba(15, 20, 30, 0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px 6px; z-index: 10;">
+              <button onclick="zoomCanvas('circle-preview-canvas', 0.25)" title="Zoom In" style="background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
+              <span id="circle-preview-canvas-zoom-label" style="font-size: 0.78rem; font-weight: 700; color: #fff; min-width: 40px; text-align: center;">100%</span>
+              <button onclick="zoomCanvas('circle-preview-canvas', -0.25)" title="Zoom Out" style="background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; width: 26px; height: 26px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center;">−</button>
+              <button onclick="resetCanvasZoom('circle-preview-canvas')" title="Reset Zoom" style="background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #aaa; width: 26px; height: 26px; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">↺</button>
+            </div>
+            <canvas id="circle-preview-canvas" width="360" height="360" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; max-width: 100%; height: auto;"></canvas>
+          </div>
+        </div>
+
+        
         <div class="guide-section-card calc-card">
           <div class="guide-card-header">
             <i data-lucide="shield-check" class="header-icon"></i>
             <h2>Vertical Immunity Calculator</h2>
           </div>
-          
+
           <div class="guide-input-group">
             <div class="guide-input-box">
               <label for="guide-range-input">Enemy Attack Range:</label>
@@ -1012,6 +1051,44 @@ function renderBuildingGuide() {
           <div id="guide-calc-results"></div>
         </div>
 
+        
+        <div class="guide-section-card" style="margin-top: 1.5rem; background: rgba(15, 20, 30, 0.6); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem 1.4rem;">
+          <div class="guide-card-header" style="margin-bottom: 0.85rem;">
+            <i data-lucide="scale" class="header-icon" style="color: var(--secondary-color);"></i>
+            <h2>Target Weight & Plot Limits Calculator</h2>
+          </div>
+
+          
+          <div class="guide-input-group" style="margin-bottom: 0.5rem; align-items: center;">
+            <div class="guide-input-box" style="margin-bottom: 0; flex: 1;">
+              <label for="target-weight-input" style="color: #ffd32a; font-weight: 700;">Enter Current Max Weight:</label>
+              <input type="number" id="target-weight-input" value="300" min="300" max="10000" step="30" oninput="updateWeightCalc()" placeholder="e.g. 300" style="border-color: #ffd32a;" />
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.3rem;">
+              <input type="checkbox" id="weight-vip-pass" onchange="updateWeightCalc()" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--secondary-color);" />
+              <label for="weight-vip-pass" style="cursor: pointer; font-size: 0.88rem; font-weight: 600; color: #fff;">VIP Gamepass (+150 Base Weight)</label>
+            </div>
+          </div>
+
+          <div id="weight-calc-results"></div>
+
+          
+          <div style="background: rgba(224, 197, 125, 0.08); border: 1px solid rgba(224, 197, 125, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-top: 1rem;">
+            <div style="font-weight: 700; color: #fff; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+              <i data-lucide="calculator" style="width: 16px; height: 16px; color: var(--secondary-color);"></i>
+              Weight Upgrade Scaling Formula:
+            </div>
+            <div style="font-size: 0.84rem; color: #eee; line-height: 1.5;">
+              • Starting base weight is <strong>300</strong> (or <strong>450</strong> with VIP Pass).<br/>
+              • Each upgrade purchase adds <strong>+30 Max Weight</strong>.<br/>
+              • The upgrade cost formula for tier <em>N</em> is:<br/>
+              <code style="display: inline-block; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 4px; color: #ffd32a; font-size: 0.85rem; margin-top: 5px;">Cost(N) = 0.1 × (1.169)^(N - 1) &nbsp;[where N = (Weight − Base) / 30 + 1]</code><br/>
+              <code style="display: inline-block; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 4px; color: #3bf2ff; font-size: 0.85rem; margin-top: 3px;">Total_Cost(N) = 0.1 × ((1.169)^N − 1) / (1.169 − 1)</code>
+            </div>
+          </div>
+        </div>
+
       </div>
     `;
   }
@@ -1021,10 +1098,10 @@ function renderBuildingGuide() {
   updateGuideCalc();
   updateCircleCalc();
   updateTanSpawnCalc();
+  updateWeightCalc();
   if (window.lucide) window.lucide.createIcons();
 }
 
-// Runnable self-check for non-trivial formulas (Ponytail check)
 (function selfCheckBuildingGuideLogic() {
   const targetH25Normal = directTargetImmunityHeight(25, 1.0);
   console.assert(targetH25Normal === 8, "Self-check failed: Normal Range 25 untargetable height should be 8");
@@ -1038,7 +1115,22 @@ function renderBuildingGuide() {
   const trapBlocks = get50PercentCoverageTrapBlocks(6.67, 21);
   console.assert(trapBlocks.length > 0, "Self-check failed: 50% coverage trap blocks should generate tiles");
 
-  const mines = getOptimalMinePositionsInTrapTiles(8, 6.67, 21, trapBlocks);
-  console.assert(mines.length === 8, "Self-check failed: 8 mines should generate 8 optimal discrete coordinates inside trap blocks");
-  console.assert(mines.every(m => trapBlocks.some(tb => tb.x === m.x && tb.z === m.z)), "Self-check failed: All mines must be placed inside trap blocks");
+  const mines = getOptimalMinePositionsInTrapTiles(8, ringBlocks);
+  console.assert(mines.length === 8, "Self-check failed: 8 mines should generate 8 optimal discrete coordinates on the spawn line");
+  console.assert(mines.every(m => ringBlocks.some(rb => rb.x === m.x && rb.z === m.z)), "Self-check failed: All mines must be placed directly on the spawn line");
+
+  const cTier1 = calcWeightUpgradeCost(1);
+  console.assert(Math.abs(cTier1 - 0.1) < 0.001, "Self-check failed: Tier 1 upgrade cost must be 0.1");
+
+  const c1740Vip = calcWeightUpgradeCost(44);
+  console.assert(Math.abs(c1740Vip - 82.5) < 0.1, "Self-check failed: 1740 Weight (VIP Tier 44) upgrade cost must match 82.5");
+
+  const c1770Vip = calcWeightUpgradeCost(45);
+  console.assert(Math.abs(c1770Vip - 96.4) < 0.1, "Self-check failed: 1770 Weight (VIP Tier 45) upgrade cost must match 96.4");
+
+  const cTier81 = calcWeightUpgradeCost(81);
+  console.assert(Math.abs(cTier81 - 26700) < 100, "Self-check failed: Tier 81 upgrade cost must match 26.7K");
+
+  const cTier96 = calcWeightUpgradeCost(96);
+  console.assert(Math.abs(cTier96 - 277000) < 1000, "Self-check failed: Tier 96 upgrade cost must match 277K");
 })();
