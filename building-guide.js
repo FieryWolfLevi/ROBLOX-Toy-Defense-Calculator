@@ -579,7 +579,7 @@ function runTanSpawnCalcLogic() {
   attachCanvasInteractions("tan-spawn-canvas");
 
   const soldierRange = Math.max(1, parseFloat(rangeInput.value) || 18);
-  const enemyRange = Math.max(0, parseFloat(enemyRangeInput?.value) || 20);
+  const enemyRange = Math.max(0, parseFloat(enemyRangeInput?.value) || 50);
   const mineCount = Math.max(0, parseInt(mineCountInput?.value) || 0);
   const mineAoeStuds = Math.max(0, parseFloat(mineAoeInput?.value) || 0);
   const mineAoeBlocks = mineAoeStuds / 3.0;
@@ -851,7 +851,7 @@ function renderBuildingGuide() {
 
             <div class="guide-input-box">
               <label for="tan-enemy-range-input">Tan Enemy Range:</label>
-              <input type="number" id="tan-enemy-range-input" value="20" min="0" max="250" step="1" oninput="updateTanSpawnCalc()" placeholder="e.g. 20" />
+              <input type="number" id="tan-enemy-range-input" value="50" min="0" max="250" step="1" oninput="updateTanSpawnCalc()" placeholder="e.g. 50" />
             </div>
           </div>
 
