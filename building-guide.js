@@ -66,42 +66,200 @@ function formatCrackerNumber(num) {
   return (num / 1000).toFixed(2) + "K";
 }
 
-function updateWeightCalc() {
-  const input = document.getElementById("target-weight-input");
-  const vipCheckbox = document.getElementById("weight-vip-pass");
-  const resultsBox = document.getElementById("weight-calc-results");
-  if (!input || !resultsBox) return;
+function calcWeightRangeCost(startWeight, targetWeight, hasVip = false) {
+  const baseWeight = WEIGHT_BASE_DEFAULT + (hasVip ? 150 : 0);
+  const rawStart = parseInt(startWeight);
+  const safeStartW = Math.max(baseWeight, isNaN(rawStart) ? baseWeight : rawStart);
+
+  const rawTarget = parseInt(targetWeight);
+  const safeTargetW = Math.max(baseWeight, isNaN(rawTarget) ? safeStartW : rawTarget);
+
+  const startTier = Math.floor((safeStartW - baseWeight) / WEIGHT_STEP);
+  const effectiveStartWeight = baseWeight + startTier * WEIGHT_STEP;
+
+  const targetTier = Math.floor((safeTargetW - baseWeight) / WEIGHT_STEP);
+  const effectiveTargetWeight = baseWeight + targetTier * WEIGHT_STEP;
+
+  const upgradesCount = Math.max(0, targetTier - startTier);
+
+  let totalCost = 0;
+  const tiersBreakdown = [];
+
+  if (upgradesCount > 0) {
+    totalCost = calcTotalWeightCost(targetTier) - calcTotalWeightCost(startTier);
+
+    for (let t = startTier + 1; t <= targetTier; t++) {
+      const stepCost = calcWeightUpgradeCost(t);
+      const fromW = baseWeight + (t - 1) * WEIGHT_STEP;
+      const toW = baseWeight + t * WEIGHT_STEP;
+      tiersBreakdown.push({
+        tierIndex: t,
+        fromWeight: fromW,
+        toWeight: toW,
+        cost: stepCost,
+      });
+    }
+  }
+
+  return {
+    baseWeight,
+    startWeight: safeStartW,
+    effectiveStartWeight,
+    startTier,
+    targetWeight: safeTargetW,
+    effectiveTargetWeight,
+    targetTier,
+    upgradesCount,
+    totalCost,
+    tiersBreakdown,
+    isValid: safeTargetW > safeStartW,
+  };
+}
+
+function updateWeightRangeCardCalc() {
+  const startInput = document.getElementById("weight-range-start");
+  const targetInput = document.getElementById("weight-range-target");
+  const vipCheckbox = document.getElementById("weight-range-vip");
+  const resultsBox = document.getElementById("weight-range-results");
+  if (!resultsBox || !startInput || !targetInput) return;
 
   const hasVip = vipCheckbox ? vipCheckbox.checked : false;
   const baseWeight = WEIGHT_BASE_DEFAULT + (hasVip ? 150 : 0);
 
-  const rawW = parseInt(input.value) || baseWeight;
-  const currentW = Math.max(baseWeight, rawW);
+  const startVal = startInput.value.trim() !== "" ? parseInt(startInput.value) : baseWeight;
+  const nextDefaultTarget = startVal + WEIGHT_STEP;
+  targetInput.placeholder = nextDefaultTarget.toString();
 
-  const upgradesCompleted = Math.floor((currentW - baseWeight) / WEIGHT_STEP);
-  const effectiveWeight = baseWeight + upgradesCompleted * WEIGHT_STEP;
-  const nextTargetWeight = effectiveWeight + WEIGHT_STEP;
+  const targetVal = targetInput.value.trim() !== "" ? parseInt(targetInput.value) : nextDefaultTarget;
 
-  const nextTierIndex = upgradesCompleted + 1;
-  const nextUpgradeCost = calcWeightUpgradeCost(nextTierIndex);
-  const totalCumulativeCost = calcTotalWeightCost(upgradesCompleted);
+  const res = calcWeightRangeCost(startVal, targetVal, hasVip);
+
+  if (!res.isValid) {
+    resultsBox.innerHTML = `
+      <div class="weight-invalid-notice">
+        <div style="font-weight: 700; margin-bottom: 0.25rem;">Target weight must be greater than starting weight</div>
+        <div style="font-size: 0.8rem; color: #ccc;">Starting base weight is at least ${res.baseWeight}. Enter a target weight higher than ${res.effectiveStartWeight}.</div>
+      </div>
+    `;
+    return;
+  }
+
+  const budgetInput = document.getElementById("budget-input");
+  const budget = budgetInput ? parseFloat(budgetInput.value) || 0 : 0;
+  let budgetBannerHTML = "";
+  if (budget > 0) {
+    if (budget >= res.totalCost) {
+      const remaining = budget - res.totalCost;
+      budgetBannerHTML = `
+        <div class="weight-budget-banner banner-success">
+          <i data-lucide="check-circle-2" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+          <span>You have enough crackers! (${formatCrackerNumber(budget)} in budget &bull; <strong>${formatCrackerNumber(remaining)} remaining</strong> after upgrade)</span>
+        </div>
+      `;
+    } else {
+      const diff = res.totalCost - budget;
+      budgetBannerHTML = `
+        <div class="weight-budget-banner banner-warning">
+          <i data-lucide="alert-circle" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+          <span>Need <strong>${formatCrackerNumber(diff)}</strong> more crackers (Budget: ${formatCrackerNumber(budget)} &bull; Cost: ${formatCrackerNumber(res.totalCost)})</span>
+        </div>
+      `;
+    }
+  }
+
+  let cumulative = 0;
+  const rowsHTML = res.tiersBreakdown.map((item) => {
+    cumulative += item.cost;
+    return `
+      <tr>
+        <td><span style="font-weight: 700; color: #fff;">Tier ${item.tierIndex}</span></td>
+        <td>${item.fromWeight} &rarr; ${item.toWeight}</td>
+        <td class="tier-cost-cell">${formatCrackerNumber(item.cost)}</td>
+        <td style="color: #bbb;">${formatCrackerNumber(cumulative)}</td>
+      </tr>
+    `;
+  }).join("");
 
   resultsBox.innerHTML = `
-    <div class="guide-stats-grid" style="margin-top: 1rem;">
-      <div class="guide-stat-card highlight" style="border-color: #ffd32a;">
-        <div class="stat-label" style="color: #ffd32a;">Upgrade Cost (${effectiveWeight} → ${nextTargetWeight})</div>
-        <div class="stat-value" style="color: #ffd32a;">${formatCrackerNumber(nextUpgradeCost)} <span class="unit">Crackers</span></div>
+    <div class="weight-results-container" style="display: flex; flex-direction: column; gap: 0.85rem; margin-top: 0.5rem;">
+      <div class="weight-stats-grid">
+        <div class="weight-stat-card highlight-gold">
+          <div class="wstat-label">Total Crackers Needed</div>
+          <div class="wstat-value">${formatCrackerNumber(res.totalCost)} <span class="wstat-unit">Crackers</span></div>
+          <div class="wstat-exact">${res.totalCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+        </div>
+        <div class="weight-stat-card highlight-green">
+          <div class="wstat-label">Upgrades Needed</div>
+          <div class="wstat-value">${res.upgradesCount} <span class="wstat-unit">Tiers</span></div>
+          <div class="wstat-sub">Tier ${res.startTier + 1} &rarr; Tier ${res.targetTier}</div>
+        </div>
+        <div class="weight-stat-card">
+          <div class="wstat-label">Weight Gain</div>
+          <div class="wstat-value">+${res.effectiveTargetWeight - res.effectiveStartWeight} <span class="wstat-unit">Weight</span></div>
+          <div class="wstat-sub">${res.effectiveStartWeight} &rarr; ${res.effectiveTargetWeight}</div>
+        </div>
       </div>
-      <div class="guide-stat-card highlight stat-immune">
-        <div class="stat-label">Total Spent So Far</div>
-        <div class="stat-value">${formatCrackerNumber(totalCumulativeCost)} <span class="unit">Crackers (from ${baseWeight})</span></div>
-      </div>
-      <div class="guide-stat-card">
-        <div class="stat-label">Completed Upgrades</div>
-        <div class="stat-value">${upgradesCompleted} <span class="unit">tiers (${effectiveWeight} Max Weight)</span></div>
+
+      ${budgetBannerHTML}
+
+      <div class="weight-breakdown-section">
+        <div class="weight-breakdown-header">
+          <span class="weight-breakdown-title">
+            <i data-lucide="list-ordered" style="width: 16px; height: 16px; color: var(--secondary-color);"></i> Upgrade Tier Breakdown (${res.upgradesCount} Steps)
+          </span>
+        </div>
+        <div class="weight-breakdown-table-wrap">
+          <table class="weight-breakdown-table">
+            <thead>
+              <tr>
+                <th>Tier #</th>
+                <th>Weight Step</th>
+                <th>Tier Cost</th>
+                <th>Cumulative Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHTML}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   `;
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function setWeightRangeStart(val) {
+  const startInput = document.getElementById("weight-range-start");
+  if (startInput) {
+    startInput.value = val;
+    updateWeightRangeCardCalc();
+  }
+}
+
+function adjustWeightRangeStart(delta) {
+  const startInput = document.getElementById("weight-range-start");
+  const vipCheckbox = document.getElementById("weight-range-vip");
+  const minBase = WEIGHT_BASE_DEFAULT + (vipCheckbox && vipCheckbox.checked ? 150 : 0);
+  if (startInput) {
+    const cur = parseInt(startInput.value) || minBase;
+    startInput.value = Math.max(minBase, cur + delta);
+    updateWeightRangeCardCalc();
+  }
+}
+
+function adjustWeightRangeTarget(delta) {
+  const startInput = document.getElementById("weight-range-start");
+  const targetInput = document.getElementById("weight-range-target");
+  const vipCheckbox = document.getElementById("weight-range-vip");
+  const minBase = WEIGHT_BASE_DEFAULT + (vipCheckbox && vipCheckbox.checked ? 150 : 0);
+  if (targetInput) {
+    const startW = startInput && startInput.value.trim() !== "" ? parseInt(startInput.value) || minBase : minBase;
+    const curTarget = targetInput.value.trim() !== "" ? parseInt(targetInput.value) || (startW + 30) : (startW + 30);
+    targetInput.value = Math.max(startW + 30, curTarget + delta);
+    updateWeightRangeCardCalc();
+  }
 }
 
 const canvasViewStates = {
@@ -1052,28 +1210,85 @@ function renderBuildingGuide() {
         </div>
 
         
+        <!-- Weight Upgrade & Range Calculator Card -->
         <div class="guide-section-card" style="margin-top: 1.5rem; background: rgba(15, 20, 30, 0.6); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem 1.4rem;">
           <div class="guide-card-header" style="margin-bottom: 0.85rem;">
             <i data-lucide="scale" class="header-icon" style="color: var(--secondary-color);"></i>
-            <h2>Target Weight & Plot Limits Calculator</h2>
-          </div>
-
-          
-          <div class="guide-input-group" style="margin-bottom: 0.5rem; align-items: center;">
-            <div class="guide-input-box" style="margin-bottom: 0; flex: 1;">
-              <label for="target-weight-input" style="color: #ffd32a; font-weight: 700;">Enter Current Max Weight:</label>
-              <input type="number" id="target-weight-input" value="300" min="300" max="10000" step="30" oninput="updateWeightCalc()" placeholder="e.g. 300" style="border-color: #ffd32a;" />
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1.3rem;">
-              <input type="checkbox" id="weight-vip-pass" onchange="updateWeightCalc()" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--secondary-color);" />
-              <label for="weight-vip-pass" style="cursor: pointer; font-size: 0.88rem; font-weight: 600; color: #fff;">VIP Gamepass (+150 Base Weight)</label>
+            <div>
+              <h2 style="margin: 0;">Weight Upgrade & Range Calculator</h2>
+              <div style="font-size: 0.82rem; color: var(--text-sub); margin-top: 0.15rem;">
+                Calculate total crackers needed to upgrade from your current weight to a target weight (e.g. 2610 → 2730)
+              </div>
             </div>
           </div>
 
-          <div id="weight-calc-results"></div>
+          <div class="weight-inputs-grid">
+            <div class="weight-input-card">
+              <label for="weight-range-start" class="weight-input-label">
+                <span>Current / Starting Weight</span>
+                <span class="weight-input-hint">Min 300</span>
+              </label>
+              <div class="weight-number-input-wrap">
+                <input
+                  type="number"
+                  id="weight-range-start"
+                  class="weight-number-input"
+                  value="300"
+                  min="300"
+                  step="30"
+                  placeholder="300"
+                  oninput="updateWeightRangeCardCalc()"
+                />
+                <span class="weight-input-unit">wt</span>
+              </div>
+              <div class="weight-quick-presets">
+                <button type="button" class="weight-preset-chip" onclick="setWeightRangeStart(300)">300 (Base)</button>
+                <button type="button" class="weight-preset-chip" onclick="adjustWeightRangeStart(-30)">-30</button>
+                <button type="button" class="weight-preset-chip" onclick="adjustWeightRangeStart(30)">+30</button>
+              </div>
+            </div>
 
-          
+            <div class="weight-input-card">
+              <label for="weight-range-target" class="weight-input-label">
+                <span>Target Weight</span>
+                <span class="weight-input-hint">Must be &gt; Starting</span>
+              </label>
+              <div class="weight-number-input-wrap">
+                <input
+                  type="number"
+                  id="weight-range-target"
+                  class="weight-number-input"
+                  value=""
+                  min="300"
+                  step="30"
+                  placeholder="330"
+                  oninput="updateWeightRangeCardCalc()"
+                />
+                <span class="weight-input-unit">wt</span>
+              </div>
+              <div class="weight-quick-presets">
+                <button type="button" class="weight-preset-chip" onclick="adjustWeightRangeTarget(30)">+30</button>
+                <button type="button" class="weight-preset-chip" onclick="adjustWeightRangeTarget(150)">+150</button>
+                <button type="button" class="weight-preset-chip" onclick="adjustWeightRangeTarget(300)">+300</button>
+                <button type="button" class="weight-preset-chip" onclick="adjustWeightRangeTarget(600)">+600</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="weight-vip-row">
+            <label for="weight-range-vip" class="weight-vip-label">
+              <input
+                type="checkbox"
+                id="weight-range-vip"
+                class="gamepass-checkbox"
+                onchange="updateWeightRangeCardCalc()"
+              />
+              <span><strong>VIP Gamepass</strong> (+150 Base Weight)</span>
+            </label>
+          </div>
+
+          <div id="weight-range-results"></div>
+
           <div style="background: rgba(224, 197, 125, 0.08); border: 1px solid rgba(224, 197, 125, 0.25); border-radius: 8px; padding: 0.75rem 1rem; margin-top: 1rem;">
             <div style="font-weight: 700; color: #fff; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
               <i data-lucide="calculator" style="width: 16px; height: 16px; color: var(--secondary-color);"></i>
@@ -1098,7 +1313,7 @@ function renderBuildingGuide() {
   updateGuideCalc();
   updateCircleCalc();
   updateTanSpawnCalc();
-  updateWeightCalc();
+  updateWeightRangeCardCalc();
   if (window.lucide) window.lucide.createIcons();
 }
 
@@ -1133,4 +1348,21 @@ function renderBuildingGuide() {
 
   const cTier96 = calcWeightUpgradeCost(96);
   console.assert(Math.abs(cTier96 - 277000) < 1000, "Self-check failed: Tier 96 upgrade cost must match 277K");
+
+  // Self-checks for weight range calculations (e.g. 2610 to 2730)
+  const range2610to2730NoVip = calcWeightRangeCost(2610, 2730, false);
+  console.assert(range2610to2730NoVip.upgradesCount === 4, "Self-check failed: 2610 to 2730 must be exactly 4 upgrades");
+  console.assert(range2610to2730NoVip.startTier === 77 && range2610to2730NoVip.targetTier === 81, "Self-check failed: 2610 to 2730 tiers must be 77 to 81");
+  console.assert(Math.abs(range2610to2730NoVip.totalCost - 85669.35) < 0.1, "Self-check failed: 2610 to 2730 total cost must match 85,669.35");
+
+  const range2610to2730Vip = calcWeightRangeCost(2610, 2730, true);
+  console.assert(range2610to2730Vip.upgradesCount === 4, "Self-check failed: 2610 to 2730 with VIP must be 4 upgrades");
+  console.assert(range2610to2730Vip.startTier === 72 && range2610to2730Vip.targetTier === 76, "Self-check failed: 2610 to 2730 VIP tiers must be 72 to 76");
+  console.assert(Math.abs(range2610to2730Vip.totalCost - 39237.97) < 0.1, "Self-check failed: 2610 to 2730 VIP total cost must match 39,237.97");
+
+  const rangeEqual = calcWeightRangeCost(300, 300, false);
+  console.assert(rangeEqual.upgradesCount === 0 && rangeEqual.totalCost === 0 && !rangeEqual.isValid, "Self-check failed: Equal range must have 0 upgrades and be flagged not valid");
+
+  const rangeClamped = calcWeightRangeCost(100, 330, false);
+  console.assert(rangeClamped.startWeight === 300 && rangeClamped.upgradesCount === 1, "Self-check failed: Below base weight must clamp to 300");
 })();

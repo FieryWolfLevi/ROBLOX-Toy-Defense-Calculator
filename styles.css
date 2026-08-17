@@ -1764,3 +1764,310 @@ select {
   border: 1px solid rgba(235, 77, 75, 0.4);
   color: #ff7675;
 }
+
+/* =========================================
+   WEIGHT RANGE CALCULATOR CARD
+   ========================================= */
+
+.weight-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.weight-input-card {
+  background: rgba(8, 12, 8, 0.7);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.weight-input-card:focus-within {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 12px rgba(224, 197, 125, 0.2);
+}
+
+.weight-input-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.weight-input-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.weight-number-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.weight-number-input {
+  width: 100%;
+  height: 42px;
+  background: rgba(16, 23, 16, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #ffd32a;
+  font-size: 1.15rem;
+  font-weight: 800;
+  padding: 0 2.2rem 0 0.75rem;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.weight-number-input:focus {
+  border-color: #ffd32a;
+}
+
+.weight-input-unit {
+  position: absolute;
+  right: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.weight-quick-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.weight-preset-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.2rem 0.45rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.weight-preset-chip:hover {
+  background: rgba(224, 197, 125, 0.2);
+  border-color: var(--secondary-color);
+  color: #ffd32a;
+}
+
+.weight-vip-row {
+  display: flex;
+  align-items: center;
+  background: rgba(8, 12, 8, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.weight-vip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #eee;
+  font-weight: 500;
+}
+
+.weight-vip-label strong {
+  color: var(--secondary-color);
+}
+
+.weight-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.weight-stat-card {
+  background: rgba(16, 23, 16, 0.75);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.weight-stat-card.highlight-gold {
+  border-color: rgba(255, 211, 42, 0.5);
+  background: rgba(255, 211, 42, 0.06);
+}
+
+.weight-stat-card.highlight-green {
+  border-color: rgba(70, 178, 22, 0.45);
+  background: rgba(70, 178, 22, 0.06);
+}
+
+.wstat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-sub);
+  margin-bottom: 0.25rem;
+}
+
+.weight-stat-card.highlight-gold .wstat-label {
+  color: #ffd32a;
+}
+
+.wstat-value {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.weight-stat-card.highlight-gold .wstat-value {
+  color: #ffd32a;
+}
+
+.wstat-unit {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-sub);
+}
+
+.wstat-exact {
+  font-size: 0.75rem;
+  color: #aaa;
+  margin-top: 0.2rem;
+  font-family: monospace;
+}
+
+.wstat-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.weight-budget-banner {
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.weight-budget-banner.banner-success {
+  background: rgba(70, 178, 22, 0.15);
+  border: 1px solid rgba(70, 178, 22, 0.4);
+  color: #72f038;
+}
+
+.weight-budget-banner.banner-warning {
+  background: rgba(235, 77, 75, 0.15);
+  border: 1px solid rgba(235, 77, 75, 0.4);
+  color: #ff9999;
+}
+
+.weight-breakdown-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: rgba(8, 12, 8, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+}
+
+.weight-breakdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.weight-breakdown-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.weight-breakdown-table-wrap {
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: 6px;
+  margin-top: 0.35rem;
+}
+
+.weight-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.weight-breakdown-table th {
+  background: rgba(20, 28, 20, 0.95);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.45rem 0.6rem;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.weight-breakdown-table td {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #ddd;
+}
+
+.weight-breakdown-table tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.weight-breakdown-table td.tier-cost-cell {
+  color: #ffd32a;
+  font-weight: 700;
+}
+
+.weight-invalid-notice {
+  background: rgba(235, 77, 75, 0.12);
+  border: 1px solid rgba(235, 77, 75, 0.35);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  color: #ff9999;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .weight-inputs-grid {
+    grid-template-columns: 1fr;
+  }
+  .weight-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
